@@ -44,26 +44,44 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
     super.dispose();
   }
 
+  static Color _hexToColor(String hex) {
+    try {
+      return Color(int.parse(hex.replaceFirst('#', 'FF'), radix: 16));
+    } catch (_) {
+      return LuminoTheme.primaryColor;
+    }
+  }
+
   Future<void> _save() async {
     if (_titleCtrl.text.trim().isEmpty) return;
     setState(() => _saving = true);
-    final db = ref.read(dbProvider);
-    final userId = ref.read(currentUserIdProvider) ?? 'local';
-    final startAt = DateTime(widget.date.year, widget.date.month, widget.date.day,
-        _startTime.hour, _startTime.minute);
-    final endAt = startAt.add(Duration(minutes: _durationMin));
+    try {
+      final db = ref.read(dbProvider);
+      final userId = ref.read(currentUserIdProvider) ?? 'local';
+      final startAt = DateTime(
+          widget.date.year, widget.date.month, widget.date.day,
+          _startTime.hour, _startTime.minute);
+      final endAt = startAt.add(Duration(minutes: _durationMin));
 
-    await db.taskDao.insertTask(TasksCompanion.insert(
-      userId: userId,
-      title: _titleCtrl.text.trim(),
-      iconId: Value(_iconId),
-      color: Value(_color),
-      startAt: startAt,
-      endAt: Value(endAt),
-    ));
+      await db.taskDao.insertTask(TasksCompanion.insert(
+        userId: userId,
+        title: _titleCtrl.text.trim(),
+        iconId: Value(_iconId),
+        color: Value(_color),
+        startAt: startAt,
+        endAt: Value(endAt),
+      ));
 
-    widget.onSaved();
-    if (mounted) Navigator.of(context).pop();
+      widget.onSaved();
+      if (mounted) Navigator.of(context).pop();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not save task: $e')),
+        );
+        setState(() => _saving = false);
+      }
+    }
   }
 
   @override
@@ -156,7 +174,7 @@ class _TaskFormSheetState extends ConsumerState<TaskFormSheet> {
                           height: 26,
                           margin: const EdgeInsets.only(right: 8),
                           decoration: BoxDecoration(
-                            color: Color(int.parse(c.replaceFirst('#', 'FF'), radix: 16)),
+                            color: _hexToColor(c),
                             shape: BoxShape.circle,
                             border: _color == c
                                 ? Border.all(color: Colors.black54, width: 2)
