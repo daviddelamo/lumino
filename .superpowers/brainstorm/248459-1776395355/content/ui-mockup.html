@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lumino — UI Mockup</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #F5EDE0; font-family: system-ui, -apple-system, sans-serif; padding: 32px 16px; }
+  h1 { text-align: center; color: #5C4A3A; font-size: 1.3rem; margin-bottom: 6px; font-family: Georgia, serif; }
+  .subtitle { text-align: center; color: #A08070; font-size: 0.85rem; margin-bottom: 32px; }
+
+  .screens-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+    justify-content: center;
+  }
+
+  .screen-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .screen-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #8C6A4A;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* Phone shell */
+  .phone {
+    width: 220px;
+    height: 440px;
+    background: #1A1A1A;
+    border-radius: 36px;
+    padding: 10px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    position: relative;
+  }
+  .phone-notch {
+    width: 60px; height: 14px;
+    background: #1A1A1A;
+    border-radius: 0 0 10px 10px;
+    position: absolute;
+    top: 10px; left: 50%; transform: translateX(-50%);
+    z-index: 10;
+  }
+  .phone-screen {
+    width: 100%;
+    height: 100%;
+    border-radius: 28px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* ── SCREEN 1: ONBOARDING GOALS ── */
+  .s1 { background: #FFF8F2; display: flex; flex-direction: column; }
+  .s1-header { padding: 28px 16px 12px; text-align: center; }
+  .s1-logo { font-family: Georgia, serif; font-size: 1.1rem; font-weight: 700; color: #E8823A; }
+  .s1-step { font-size: 0.6rem; color: #C4A882; margin-top: 2px; }
+  .s1-title { font-size: 0.85rem; font-weight: 700; color: #3A2A1A; margin-top: 10px; line-height: 1.3; }
+  .s1-sub { font-size: 0.65rem; color: #9A7A60; margin-top: 3px; }
+  .s1-chips { padding: 8px 14px; display: flex; flex-wrap: wrap; gap: 6px; flex: 1; align-content: flex-start; }
+  .chip { font-size: 0.6rem; padding: 5px 9px; border-radius: 20px; border: 1.5px solid #F7C59F; color: #7A5A3A; cursor: pointer; }
+  .chip.sel { background: #E8823A; border-color: #E8823A; color: white; font-weight: 600; }
+  .s1-cta { margin: 8px 14px 14px; background: #E8823A; color: white; border: none; border-radius: 14px; padding: 10px; font-size: 0.72rem; font-weight: 700; text-align: center; }
+
+  /* ── SCREEN 2: TODAY ── */
+  .s2 { background: #FFFAF6; display: flex; flex-direction: column; }
+  .s2-header { padding: 24px 14px 10px; }
+  .s2-date { font-size: 0.6rem; color: #A08070; text-transform: uppercase; letter-spacing: 1px; }
+  .s2-title-row { display: flex; justify-content: space-between; align-items: center; margin-top: 2px; }
+  .s2-dayname { font-size: 1rem; font-weight: 700; color: #3A2A1A; font-family: Georgia, serif; }
+  .s2-ring { width: 36px; height: 36px; position: relative; }
+  .s2-ring svg { width: 100%; height: 100%; }
+  .s2-ring-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 0.45rem; font-weight: 700; color: #E8823A; }
+  .s2-timeline { flex: 1; overflow: hidden; padding: 4px 14px 0; }
+  .time-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: flex-start; }
+  .time-label { font-size: 0.55rem; color: #C4A882; width: 28px; flex-shrink: 0; padding-top: 4px; }
+  .task-card { flex: 1; border-radius: 10px; padding: 7px 8px; position: relative; }
+  .task-card.amber { background: #FFF0E0; border-left: 3px solid #E8823A; }
+  .task-card.green { background: #EDFAF3; border-left: 3px solid #4CAF82; }
+  .task-card.purple { background: #F5F0FF; border-left: 3px solid #9B72D0; }
+  .task-card.done { opacity: 0.5; }
+  .task-name { font-size: 0.6rem; font-weight: 600; color: #3A2A1A; }
+  .task-meta { font-size: 0.52rem; color: #A08070; margin-top: 1px; }
+  .task-check { position: absolute; right: 7px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid #D0B898; display: flex; align-items: center; justify-content: center; font-size: 0.5rem; }
+  .task-check.done { background: #E8823A; border-color: #E8823A; color: white; }
+  .time-line { width: 100%; height: 1px; background: #F0E0D0; margin: 2px 0 6px 36px; }
+  .s2-tab { display: flex; padding: 6px 0 8px; border-top: 1px solid #F0E0D0; justify-content: space-around; }
+  .tab-item { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 0.5rem; color: #C4A882; }
+  .tab-item.active { color: #E8823A; }
+  .tab-icon { font-size: 1rem; line-height: 1; }
+  .fab { position: absolute; right: 12px; bottom: 46px; width: 30px; height: 30px; border-radius: 50%; background: #E8823A; color: white; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; box-shadow: 0 4px 12px rgba(232,130,58,0.4); font-weight: 300; }
+
+  /* ── SCREEN 3: ADD TASK ── */
+  .s3 { background: #FFFAF6; display: flex; flex-direction: column; }
+  .s3-handle { width: 32px; height: 4px; background: #E0C8B0; border-radius: 2px; margin: 10px auto 8px; }
+  .s3-heading { font-size: 0.8rem; font-weight: 700; color: #3A2A1A; text-align: center; margin-bottom: 12px; font-family: Georgia, serif; }
+  .s3-field { margin: 0 14px 8px; }
+  .s3-label { font-size: 0.55rem; color: #A08070; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 3px; }
+  .s3-input { background: #FFF0E0; border-radius: 10px; padding: 7px 10px; font-size: 0.65rem; color: #3A2A1A; }
+  .s3-icon-row { display: flex; gap: 5px; flex-wrap: wrap; }
+  .s3-icon { width: 22px; height: 22px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; cursor: pointer; }
+  .s3-icon.sel { outline: 2px solid #E8823A; }
+  .s3-color-row { display: flex; gap: 5px; }
+  .s3-color { width: 18px; height: 18px; border-radius: 50%; cursor: pointer; }
+  .s3-color.sel { outline: 2px solid #3A2A1A; outline-offset: 2px; }
+  .s3-time-row { display: flex; gap: 8px; margin: 0 14px 8px; }
+  .s3-time-box { flex: 1; background: #FFF0E0; border-radius: 10px; padding: 6px 8px; text-align: center; font-size: 0.65rem; color: #5C4A3A; font-weight: 600; }
+  .s3-save { margin: 8px 14px 12px; background: #E8823A; color: white; border: none; border-radius: 14px; padding: 10px; font-size: 0.72rem; font-weight: 700; text-align: center; }
+
+  /* ── SCREEN 4: HABITS ── */
+  .s4 { background: #FFFAF6; display: flex; flex-direction: column; }
+  .s4-header { padding: 24px 14px 10px; }
+  .s4-title { font-size: 1rem; font-weight: 700; color: #3A2A1A; font-family: Georgia, serif; }
+  .s4-sub { font-size: 0.6rem; color: #A08070; margin-top: 2px; }
+  .s4-list { flex: 1; overflow: hidden; padding: 4px 14px 0; }
+  .habit-card { background: white; border-radius: 12px; padding: 8px 10px; margin-bottom: 7px; display: flex; align-items: center; gap: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .habit-icon { width: 28px; height: 28px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; flex-shrink: 0; }
+  .habit-info { flex: 1; }
+  .habit-name { font-size: 0.62rem; font-weight: 600; color: #3A2A1A; }
+  .habit-streak { font-size: 0.52rem; color: #A08070; margin-top: 1px; }
+  .habit-prog { margin-top: 3px; background: #F0E0D0; border-radius: 4px; height: 3px; }
+  .habit-prog-fill { height: 100%; border-radius: 4px; }
+  .habit-check { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid #D0B898; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; flex-shrink: 0; }
+  .habit-check.done { background: #E8823A; border-color: #E8823A; color: white; }
+
+  /* ── SCREEN 5: HABIT DETAIL ── */
+  .s5 { background: #FFFAF6; display: flex; flex-direction: column; }
+  .s5-header { padding: 20px 14px 10px; text-align: center; }
+  .s5-icon { width: 44px; height: 44px; border-radius: 16px; background: #FFF0E0; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin: 0 auto 6px; }
+  .s5-name { font-size: 0.9rem; font-weight: 700; color: #3A2A1A; font-family: Georgia, serif; }
+  .s5-stats { display: flex; gap: 8px; padding: 0 14px 8px; justify-content: center; }
+  .stat-box { flex: 1; background: white; border-radius: 10px; padding: 7px 4px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .stat-val { font-size: 0.9rem; font-weight: 700; color: #E8823A; font-family: Georgia, serif; }
+  .stat-lbl { font-size: 0.48rem; color: #A08070; text-transform: uppercase; letter-spacing: 0.5px; }
+  .s5-heatmap { padding: 6px 14px; }
+  .s5-heatmap-label { font-size: 0.55rem; color: #A08070; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 5px; }
+  .heatmap-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; }
+  .hm-cell { aspect-ratio: 1; border-radius: 2px; }
+
+  .s5-log { padding: 6px 14px; }
+  .log-row { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
+  .log-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .log-date { font-size: 0.55rem; color: #7A6050; }
+  .log-val { font-size: 0.55rem; color: #A08070; margin-left: auto; }
+</style>
+</head>
+<body>
+
+<h1>Lumino — Daily Rhythm</h1>
+<p class="subtitle">MVP UI Mockup · Android · Flutter</p>
+
+<div class="screens-grid">
+
+  <!-- SCREEN 1: ONBOARDING GOALS -->
+  <div class="screen-wrap">
+    <div class="screen-label">Onboarding · Goals</div>
+    <div class="phone">
+      <div class="phone-notch"></div>
+      <div class="phone-screen s1">
+        <div class="s1-header">
+          <div class="s1-logo">Lumino</div>
+          <div class="s1-step">Step 2 of 6 · ●●○○○○</div>
+          <div class="s1-title">What do you want to work on?</div>
+          <div class="s1-sub">Pick as many as you like</div>
+        </div>
+        <div class="s1-chips">
+          <div class="chip sel">🌙 Better sleep</div>
+          <div class="chip sel">🏃 Exercise</div>
+          <div class="chip">🧘 Mindfulness</div>
+          <div class="chip sel">📚 Study</div>
+          <div class="chip">💼 Work focus</div>
+          <div class="chip">💆 Self-care</div>
+          <div class="chip">🥗 Nutrition</div>
+          <div class="chip">✍️ Journaling</div>
+          <div class="chip">💧 Hydration</div>
+        </div>
+        <div class="s1-cta">Continue →</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: TODAY VIEW -->
+  <div class="screen-wrap">
+    <div class="screen-label">Today · Daily Planner</div>
+    <div class="phone">
+      <div class="phone-notch"></div>
+      <div class="phone-screen s2">
+        <div class="s2-header">
+          <div class="s2-date">Thursday · Apr 17</div>
+          <div class="s2-title-row">
+            <div class="s2-dayname">Good morning ☀️</div>
+            <div class="s2-ring">
+              <svg viewBox="0 0 36 36">
+                <circle cx="18" cy="18" r="14" fill="none" stroke="#F0E0D0" stroke-width="3"/>
+                <circle cx="18" cy="18" r="14" fill="none" stroke="#E8823A" stroke-width="3"
+                  stroke-dasharray="52.7 35.2" stroke-dashoffset="22" stroke-linecap="round" transform="rotate(-90 18 18)"/>
+              </svg>
+              <div class="s2-ring-label">3/5</div>
+            </div>
+          </div>
+        </div>
+        <div class="s2-timeline">
+          <div class="time-row">
+            <div class="time-label">7:00</div>
+            <div class="task-card amber done">
+              <div class="task-name">🧘 Morning meditation</div>
+              <div class="task-meta">10 min · done</div>
+              <div class="task-check done">✓</div>
+            </div>
+          </div>
+          <div class="time-row">
+            <div class="time-label">8:00</div>
+            <div class="task-card green done">
+              <div class="task-name">☕ Breakfast</div>
+              <div class="task-meta">20 min · done</div>
+              <div class="task-check done">✓</div>
+            </div>
+          </div>
+          <div class="time-row">
+            <div class="time-label">9:30</div>
+            <div class="task-card purple">
+              <div class="task-name">💼 Deep work block</div>
+              <div class="task-meta">90 min · upcoming</div>
+              <div class="task-check"></div>
+            </div>
+          </div>
+          <div class="time-row">
+            <div class="time-label">12:00</div>
+            <div class="task-card amber">
+              <div class="task-name">🥗 Lunch break</div>
+              <div class="task-meta">45 min · upcoming</div>
+              <div class="task-check"></div>
+            </div>
+          </div>
+          <div class="time-row">
+            <div class="time-label">18:00</div>
+            <div class="task-card green">
+              <div class="task-name">🏃 Evening run</div>
+              <div class="task-meta">30 min · upcoming</div>
+              <div class="task-check"></div>
+            </div>
+          </div>
+        </div>
+        <div class="fab">+</div>
+        <div class="s2-tab">
+          <div class="tab-item active"><div class="tab-icon">📅</div>Today</div>
+          <div class="tab-item"><div class="tab-icon">✅</div>Habits</div>
+          <div class="tab-item"><div class="tab-icon">👤</div>Me</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: ADD TASK SHEET -->
+  <div class="screen-wrap">
+    <div class="screen-label">Add Task · Bottom Sheet</div>
+    <div class="phone">
+      <div class="phone-notch"></div>
+      <div class="phone-screen s3">
+        <div style="flex:1; background: rgba(0,0,0,0.15);"></div>
+        <div style="background:white; border-radius: 24px 24px 0 0; padding-bottom: 4px;">
+          <div class="s3-handle"></div>
+          <div class="s3-heading">New Task</div>
+          <div class="s3-field">
+            <div class="s3-label">Title</div>
+            <div class="s3-input">Evening run</div>
+          </div>
+          <div class="s3-field">
+            <div class="s3-label">Icon</div>
+            <div class="s3-icon-row">
+              <div class="s3-icon sel" style="background:#FFF0E0;">🏃</div>
+              <div class="s3-icon" style="background:#EDFAF3;">🧘</div>
+              <div class="s3-icon" style="background:#F5F0FF;">💼</div>
+              <div class="s3-icon" style="background:#FFF0E0;">☕</div>
+              <div class="s3-icon" style="background:#F0F5FF;">📚</div>
+              <div class="s3-icon" style="background:#EDFAF3;">🥗</div>
+              <div class="s3-icon" style="background:#FFF8F0;">💧</div>
+            </div>
+          </div>
+          <div class="s3-field">
+            <div class="s3-label">Color</div>
+            <div class="s3-color-row">
+              <div class="s3-color sel" style="background:#E8823A;"></div>
+              <div class="s3-color" style="background:#4CAF82;"></div>
+              <div class="s3-color" style="background:#9B72D0;"></div>
+              <div class="s3-color" style="background:#5B6EF5;"></div>
+              <div class="s3-color" style="background:#E57373;"></div>
+              <div class="s3-color" style="background:#F9C06A;"></div>
+            </div>
+          </div>
+          <div class="s3-time-row">
+            <div>
+              <div class="s3-label" style="margin-left:0;">Start</div>
+              <div class="s3-time-box">18:00</div>
+            </div>
+            <div>
+              <div class="s3-label" style="margin-left:0;">Duration</div>
+              <div class="s3-time-box">30 min</div>
+            </div>
+            <div>
+              <div class="s3-label" style="margin-left:0;">Repeat</div>
+              <div class="s3-time-box">Daily</div>
+            </div>
+          </div>
+          <div class="s3-save">Save Task</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 4: HABITS LIST -->
+  <div class="screen-wrap">
+    <div class="screen-label">Habits · List</div>
+    <div class="phone">
+      <div class="phone-notch"></div>
+      <div class="phone-screen s4">
+        <div class="s4-header">
+          <div class="s4-title">My Habits</div>
+          <div class="s4-sub">4 of 5 done today · 3 active streaks 🔥</div>
+        </div>
+        <div class="s4-list">
+          <div class="habit-card">
+            <div class="habit-icon" style="background:#FFF0E0;">💧</div>
+            <div class="habit-info">
+              <div class="habit-name">Drink water</div>
+              <div class="habit-streak">🔥 12 days · 6 / 8 glasses</div>
+              <div class="habit-prog"><div class="habit-prog-fill" style="width:75%; background:#E8823A;"></div></div>
+            </div>
+            <div class="habit-check done">✓</div>
+          </div>
+          <div class="habit-card">
+            <div class="habit-icon" style="background:#EDFAF3;">🏃</div>
+            <div class="habit-info">
+              <div class="habit-name">Exercise</div>
+              <div class="habit-streak">🔥 5 days · 20 min goal</div>
+              <div class="habit-prog"><div class="habit-prog-fill" style="width:0%; background:#4CAF82;"></div></div>
+            </div>
+            <div class="habit-check"></div>
+          </div>
+          <div class="habit-card">
+            <div class="habit-icon" style="background:#F5F0FF;">📚</div>
+            <div class="habit-info">
+              <div class="habit-name">Read</div>
+              <div class="habit-streak">🔥 8 days · 30 min goal</div>
+              <div class="habit-prog"><div class="habit-prog-fill" style="width:100%; background:#9B72D0;"></div></div>
+            </div>
+            <div class="habit-check done">✓</div>
+          </div>
+          <div class="habit-card">
+            <div class="habit-icon" style="background:#FFF8F0;">🧘</div>
+            <div class="habit-info">
+              <div class="habit-name">Meditate</div>
+              <div class="habit-streak">🔥 3 days · yes / no</div>
+              <div class="habit-prog"><div class="habit-prog-fill" style="width:100%; background:#F7C59F;"></div></div>
+            </div>
+            <div class="habit-check done">✓</div>
+          </div>
+          <div class="habit-card">
+            <div class="habit-icon" style="background:#FFF0F0;">✍️</div>
+            <div class="habit-info">
+              <div class="habit-name">Journal</div>
+              <div class="habit-streak">No streak yet · yes / no</div>
+              <div class="habit-prog"><div class="habit-prog-fill" style="width:0%;"></div></div>
+            </div>
+            <div class="habit-check"></div>
+          </div>
+        </div>
+        <div class="fab">+</div>
+        <div class="s2-tab">
+          <div class="tab-item"><div class="tab-icon">📅</div>Today</div>
+          <div class="tab-item active"><div class="tab-icon">✅</div>Habits</div>
+          <div class="tab-item"><div class="tab-icon">👤</div>Me</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 5: HABIT DETAIL -->
+  <div class="screen-wrap">
+    <div class="screen-label">Habit · Detail</div>
+    <div class="phone">
+      <div class="phone-notch"></div>
+      <div class="phone-screen s5">
+        <div class="s5-header">
+          <div class="s5-icon">📚</div>
+          <div class="s5-name">Read</div>
+        </div>
+        <div class="s5-stats">
+          <div class="stat-box">
+            <div class="stat-val">8</div>
+            <div class="stat-lbl">Streak</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val">21</div>
+            <div class="stat-lbl">Best</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val">87%</div>
+            <div class="stat-lbl">This mo.</div>
+          </div>
+        </div>
+        <div class="s5-heatmap">
+          <div class="s5-heatmap-label">Last 30 days</div>
+          <div class="heatmap-grid">
+            <!-- Row of 30 cells, varying opacity -->
+            <div class="hm-cell" style="background:#E8823A; opacity:0.9;"></div>
+            <div class="hm-cell" style="background:#E8823A; opacity:0.9;"></div>
+            <div class="hm-cell" style="background:#F0E0D0;"></div>
+            <div class="hm-cell" style="background:#E8823A; opacity:0.9;"></div>
+            <div class="hm-cell" style="background:#E8823A; opacity:0.7;"></div>
+            <div class="hm-cell" style="background:#E8823A; opacity:0.9;"></div>
+            <div class="hm-cell" style="background:#E8823A; opacity:0.9;"></div>
+            <div class="hm-cell" style="background:#F0E0D0;"></div>
+            <div class="hm-cell" style="background:#E8823A; opacity:0.9;"></div>
+            <div class="hm-cell" style="background:#E8823A; opacity:0.5;"></div>
+            <div class="hm-cell" style="background:#E8823A; opacity:0.9;"></div>
+            <div class="hm-cell" style="background:#E8823A; opacity:0.9;"></div>
+            <div class="hm-cell" style="background:#E8823A; opacity:0.9;"></div>
+            <div class="hm-cell" style="background:#F0E0D0;"></div>
+            <div class="hm-cell" style="background:#E8823A; opacity:0.9;"></div>
+            <div class="hm-cell" style="background:#E8823A; opacity:0.9;"></div>
+            <div class="hm-cell" style="background:#F0E0D0;"></div>
+            <div class="hm-cell" style="background:#E8823A; opacity:0.9;"></div>
+            <div class="hm-cell" style="background:#E8823A; opacity:0.9;"></div>
+            <div class="hm-cell" style="background:#E8823A; opacity:0.9;"></div>
+            <div class="hm-cell" style="background:#E8823A; opacity:0.9;"></div>
+            <div class="hm-cell" style="background:#E8823A; opacity:0.9;"></div>
+            <div class="hm-cell" style="background:#E8823A; opacity:0.9;"></div>
+            <div class="hm-cell" style="background:#F0E0D0;"></div>
+            <div class="hm-cell" style="background:#E8823A; opacity:0.9;"></div>
+            <div class="hm-cell" style="background:#E8823A; opacity:0.9;"></div>
+            <div class="hm-cell" style="background:#E8823A; opacity:0.9;"></div>
+            <div class="hm-cell" style="background:#E8823A; opacity:0.9;"></div>
+            <div class="hm-cell" style="background:#E8823A; opacity:0.9;"></div>
+            <div class="hm-cell" style="background:#E8823A; opacity:0.9;"></div>
+          </div>
+        </div>
+        <div class="s5-log">
+          <div class="s5-heatmap-label">Recent entries</div>
+          <div class="log-row">
+            <div class="log-dot" style="background:#E8823A;"></div>
+            <div class="log-date">Today, Apr 17</div>
+            <div class="log-val">30 min ✓</div>
+          </div>
+          <div class="log-row">
+            <div class="log-dot" style="background:#E8823A;"></div>
+            <div class="log-date">Apr 16</div>
+            <div class="log-val">45 min ✓</div>
+          </div>
+          <div class="log-row">
+            <div class="log-dot" style="background:#E8823A;"></div>
+            <div class="log-date">Apr 15</div>
+            <div class="log-val">30 min ✓</div>
+          </div>
+          <div class="log-row">
+            <div class="log-dot" style="background:#F0E0D0;"></div>
+            <div class="log-date">Apr 14</div>
+            <div class="log-val" style="color:#C4A882;">skipped</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p style="text-align:center; color: #A08070; font-size: 0.78rem; margin-top: 32px;">Lumino · MVP · Android · Flutter + Riverpod · Spring Boot</p>
+
+</body>
+</html>
