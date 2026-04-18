@@ -7,6 +7,7 @@ import 'features/onboarding/screens/quiz_screen.dart';
 import 'features/onboarding/screens/routine_preview_screen.dart';
 import 'features/onboarding/screens/notifications_screen.dart';
 import 'features/onboarding/screens/signup_screen.dart';
+import 'features/today/screens/today_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -18,7 +19,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/onboarding/preview', builder: (c, s) => const RoutinePreviewScreen()),
       GoRoute(path: '/onboarding/notifications', builder: (c, s) => const NotificationsScreen()),
       GoRoute(path: '/onboarding/signup', builder: (c, s) => const SignupScreen()),
-      GoRoute(path: '/today', builder: (c, s) => const Scaffold(body: Center(child: Text('Today')))),
+      GoRoute(path: '/today', builder: (c, s) => const TodayScreen()),
+      GoRoute(path: '/habits', builder: (c, s) => const Scaffold(body: Center(child: Text('Habits')))),
+      GoRoute(path: '/me', builder: (c, s) => const Scaffold(body: Center(child: Text('Me')))),
     ],
   );
 });
