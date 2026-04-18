@@ -37,25 +37,6 @@ class _HabitDetailScreenState extends ConsumerState<HabitDetailScreen> {
     }
   }
 
-  int _longestStreak(List<DateTime> dates) {
-    if (dates.isEmpty) return 0;
-    final sorted = dates
-        .map((d) => DateTime(d.year, d.month, d.day))
-        .toSet()
-        .toList()
-      ..sort();
-    int longest = 1, current = 1;
-    for (int i = 1; i < sorted.length; i++) {
-      if (sorted[i].difference(sorted[i - 1]).inDays == 1) {
-        current++;
-        if (current > longest) longest = current;
-      } else {
-        current = 1;
-      }
-    }
-    return longest;
-  }
-
   @override
   Widget build(BuildContext context) {
     if (_habit == null) {
@@ -87,7 +68,7 @@ class _HabitDetailScreenState extends ConsumerState<HabitDetailScreen> {
               children: [
                 _StatBox(value: '$streak', label: 'Streak'),
                 const SizedBox(width: 10),
-                _StatBox(value: '${_longestStreak(entryDates)}', label: 'Best'),
+                _StatBox(value: '${longestStreak(entryDates)}', label: 'Best'),
                 const SizedBox(width: 10),
                 _StatBox(value: '$completionPct%', label: 'This month'),
               ],

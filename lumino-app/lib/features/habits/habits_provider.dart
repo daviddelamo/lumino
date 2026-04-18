@@ -91,3 +91,22 @@ int computeStreak(List<DateTime> entryDates) {
   if (latestEntry.isBefore(todayNorm.subtract(const Duration(days: 1)))) return 0;
   return streak;
 }
+
+int longestStreak(List<DateTime> entryDates) {
+  if (entryDates.isEmpty) return 0;
+  final sorted = entryDates
+      .map((d) => DateTime(d.year, d.month, d.day))
+      .toSet()
+      .toList()
+    ..sort();
+  int longest = 1, current = 1;
+  for (int i = 1; i < sorted.length; i++) {
+    if (sorted[i].difference(sorted[i - 1]).inDays == 1) {
+      current++;
+      if (current > longest) longest = current;
+    } else {
+      current = 1;
+    }
+  }
+  return longest;
+}

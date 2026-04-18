@@ -101,9 +101,19 @@ class _HabitCard extends ConsumerWidget {
           style: const TextStyle(fontSize: 12),
         ),
         trailing: GestureDetector(
-          onTap: () => ref
-              .read(habitsNotifierProvider.notifier)
-              .completeToday(habit.id, habit.targetValue),
+          onTap: () async {
+            try {
+              await ref
+                  .read(habitsNotifierProvider.notifier)
+                  .completeToday(habit.id, habit.targetValue);
+            } catch (e) {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Could not log habit: $e')),
+                );
+              }
+            }
+          },
           child: Container(
             width: 30,
             height: 30,
