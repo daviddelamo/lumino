@@ -30,9 +30,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     setState(() { _loading = true; _error = null; });
     try {
       await ref.read(_authServiceProvider).register(_emailCtrl.text.trim(), _passwordCtrl.text);
-      if (mounted) context.go('/today');
+      if (context.mounted) context.go('/today');
     } catch (e) {
-      setState(() { _error = e.toString(); _loading = false; });
+      if (mounted) setState(() { _error = e.toString(); _loading = false; });
     }
   }
 
