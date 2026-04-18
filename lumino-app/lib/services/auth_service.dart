@@ -12,16 +12,24 @@ class AuthService {
   Future<void> register(String email, String password) async {
     final res = await _client.post('/api/auth/register',
         data: {'email': email, 'password': password});
-    final data = res.data['data'];
-    await _client.saveTokens(data['accessToken'] as String, data['refreshToken'] as String);
+    _saveTokensFromResponse(res.data);
   }
 
   Future<void> login(String email, String password) async {
     final res = await _client.post('/api/auth/login',
         data: {'email': email, 'password': password});
-    final data = res.data['data'];
-    await _client.saveTokens(data['accessToken'] as String, data['refreshToken'] as String);
+    await _saveTokensFromResponse(res.data);
   }
 
   Future<void> logout() => _client.clearTokens();
+
+  Future<void> _saveTokensFromResponse(dynamic responseData) async {
+    final data = responseData['data'] as Map<String, dynamic>?;
+    final accessToken = data?['accessToken'] as String?;
+    final refreshToken = data?['refreshToken'] as String?;
+    if (accessToken == null || refreshToken == null) {
+      throw Exception('Invalid auth response: missing tokens');
+    }
+    await _client.saveTokens(accessToken, refreshToken);
+  }
 }

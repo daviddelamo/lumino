@@ -38,7 +38,7 @@ class ApiClient {
   }
 }
 
-class _AuthInterceptor extends Interceptor {
+class _AuthInterceptor extends QueuedInterceptor {
   final FlutterSecureStorage _storage;
   final Dio _dio;
   final String _baseUrl;
@@ -46,26 +46,28 @@ class _AuthInterceptor extends Interceptor {
   _AuthInterceptor(this._storage, this._dio, this._baseUrl);
 
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+  Future<void> onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
     final token = await _storage.read(key: 'access_token');
     if (token != null) options.headers['Authorization'] = 'Bearer $token';
     handler.next(options);
   }
 
   @override
-  void onError(DioException err, ErrorInterceptorHandler handler) async {
+  Future<void> onError(DioException err, ErrorInterceptorHandler handler) async {
     if (err.response?.statusCode == 401) {
       final refreshToken = await _storage.read(key: 'refresh_token');
       if (refreshToken != null) {
         try {
           final response = await Dio(BaseOptions(baseUrl: _baseUrl))
               .post('/api/auth/refresh', data: {'refreshToken': refreshToken});
-          final newToken = response.data['data']['accessToken'] as String;
-          await _storage.write(key: 'access_token', value: newToken);
-          err.requestOptions.headers['Authorization'] = 'Bearer $newToken';
-          final retryResponse = await _dio.fetch(err.requestOptions);
-          return handler.resolve(retryResponse);
-        } catch (_) {
+          final newAccessToken = response.data['data']['accessToken'] as String?;
+          if (newAccessToken != null) {
+            await _storage.write(key: 'access_token', value: newAccessToken);
+            err.requestOptions.headers['Authorization'] = 'Bearer $newAccessToken';
+            final retryResponse = await _dio.fetch(err.requestOptions);
+            return handler.resolve(retryResponse);
+          }
+        } catch (e) {
           await _storage.delete(key: 'access_token');
           await _storage.delete(key: 'refresh_token');
         }
