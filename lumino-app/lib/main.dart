@@ -7,16 +7,17 @@ void main() {
   runApp(const ProviderScope(child: LuminoApp()));
 }
 
-class LuminoApp extends StatelessWidget {
+class LuminoApp extends ConsumerWidget {
   const LuminoApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(appRouterProvider);
     return MaterialApp.router(
       title: 'Lumino',
       theme: LuminoTheme.light(),
       darkTheme: LuminoTheme.dark(),
-      routerConfig: appRouter,
+      routerConfig: router,
     );
   }
 }
