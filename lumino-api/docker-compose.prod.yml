@@ -1,6 +1,8 @@
 services:
   app:
-    build: .
+    build:
+      context: ./lumino-api
+      dockerfile: Dockerfile
     environment:
       - SERVICE_FQDN_APP_8080
       - DATABASE_URL=jdbc:postgresql://db:5432/lumino
