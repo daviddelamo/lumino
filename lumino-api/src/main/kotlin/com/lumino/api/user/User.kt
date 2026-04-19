@@ -16,6 +16,7 @@ class User(
     @Column(name = "password_hash") private val passwordHash: String? = null,
     val displayName: String? = null,
     val authProvider: String = "email",
+    @Column(name = "facebook_id") val facebookId: String? = null,
     val locale: String = "en",
     val timezone: String = "UTC",
     @JdbcTypeCode(SqlTypes.JSON) @Column(columnDefinition = "jsonb") val onboardingProfile: String? = null,

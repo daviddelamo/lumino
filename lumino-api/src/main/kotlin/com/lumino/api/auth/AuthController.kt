@@ -29,4 +29,8 @@ class AuthController(private val authService: AuthService) {
     @PostMapping("/google")
     fun googleLogin(@Valid @RequestBody request: GoogleAuthRequest) =
         ApiResponse.ok(authService.loginWithGoogle(request))
+
+    @PostMapping("/facebook")
+    fun facebookLogin(@Valid @RequestBody request: FacebookAuthRequest) =
+        ApiResponse.ok(authService.loginWithFacebook(request))
 }

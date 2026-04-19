@@ -19,7 +19,8 @@ class AuthService(
     private val jwtService: JwtService,
     private val passwordEncoder: PasswordEncoder,
     private val jwtConfig: JwtConfig,
-    private val googleOAuthService: GoogleOAuthService
+    private val googleOAuthService: GoogleOAuthService,
+    private val facebookOAuthService: FacebookOAuthService
 ) {
     @Transactional
     fun register(request: RegisterRequest): AuthResponse {
@@ -61,6 +62,24 @@ class AuthService(
                     authProvider = "google"
                 )
             )
+        if (user.deletedAt != null) throw IllegalArgumentException("Account has been deleted")
+        return issueTokens(user)
+    }
+
+    @Transactional
+    fun loginWithFacebook(request: FacebookAuthRequest): AuthResponse {
+        val fbUser = facebookOAuthService.verifyAccessToken(request.accessToken)
+        val email = fbUser.email
+        val user = if (email != null) {
+            userRepository.findByEmail(email) ?: userRepository.save(
+                User(email = email, displayName = fbUser.displayName, authProvider = "facebook")
+            )
+        } else {
+            // Facebook did not share email — create an account keyed on Facebook ID
+            userRepository.findByFacebookId(fbUser.facebookId) ?: userRepository.save(
+                User(facebookId = fbUser.facebookId, displayName = fbUser.displayName, authProvider = "facebook")
+            )
+        }
         if (user.deletedAt != null) throw IllegalArgumentException("Account has been deleted")
         return issueTokens(user)
     }
