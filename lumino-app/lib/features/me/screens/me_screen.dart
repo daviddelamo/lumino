@@ -2,11 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../theme_provider.dart';
-import '../../../services/auth_service.dart';
-import '../../../services/api_client.dart';
+import '../me_providers.dart';
 import '../../../theme.dart';
-
-final _authProvider = Provider<AuthService>((ref) => AuthService(ApiClient()));
 
 class MeScreen extends ConsumerWidget {
   const MeScreen({super.key});
@@ -79,17 +76,17 @@ class MeScreen extends ConsumerWidget {
   void _confirmDelete(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Delete account?'),
         content: const Text('This will schedule your account for deletion in 30 days.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancel')),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () async {
-              await ref.read(_authProvider).logout();
+              Navigator.pop(dialogContext);
+              await ref.read(authServiceProvider).logout();
               if (context.mounted) {
-                Navigator.pop(context);
                 context.go('/onboarding/welcome');
               }
             },

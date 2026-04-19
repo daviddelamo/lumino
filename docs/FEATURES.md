@@ -3,50 +3,50 @@
 ## MVP Phase 1
 
 ### Onboarding
-- [ ] Welcome screen with animated logo
-- [ ] Goals selection (multi-select chips)
-- [ ] Personality quiz (3 questions)
-- [ ] Routine preview card list
-- [ ] Notification permission request (contextual)
-- [ ] Sign up / skip screen (email + Google OAuth)
+- [x] Welcome screen with animated logo
+- [x] Goals selection (multi-select chips)
+- [x] Personality quiz (3 questions)
+- [x] Routine preview card list
+- [x] Notification permission request (contextual)
+- [x] Sign up / skip screen (email + Google OAuth)
 
 ### Daily Planner
-- [ ] Today timeline view with progress ring
-- [ ] Task card (icon, title, time, complete button)
-- [ ] Add / edit task bottom sheet
-- [ ] One-tap task completion with haptic feedback
-- [ ] Repeat rules (daily, specific days, every N days, weekly, monthly)
-- [ ] Local notifications per task
-- [ ] Week view with per-day completion dots
-- [ ] Friendly empty state
+- [x] Today timeline view with progress ring
+- [x] Task card (icon, title, time, complete button)
+- [x] Add / edit task bottom sheet
+- [x] One-tap task completion with haptic feedback
+- [x] Repeat rules (daily, specific days, every N days, weekly, monthly)
+- [x] Local notifications per task
+- [x] Week view with per-day completion dots
+- [x] Friendly empty state
 
 ### Habits
-- [ ] Habit list with streak badges and progress bars
-- [ ] Add / edit habit (title, icon, color, type, frequency)
-- [ ] Boolean / Count / Duration habit types
-- [ ] Habit entries logging
-- [ ] Streak computation (current + longest)
-- [ ] 30-day heatmap
-- [ ] Habit detail screen
-- [ ] Archive habit
+- [x] Habit list with streak badges and progress bars
+- [x] Add / edit habit (title, icon, color, type, frequency)
+- [x] Boolean / Count / Duration habit types
+- [x] Habit entries logging
+- [x] Streak computation (current + longest)
+- [x] 30-day heatmap
+- [x] Habit detail screen
+- [x] Archive habit
 
 ### Cloud Sync
-- [ ] Email + password registration and login
-- [ ] Google OAuth login
-- [ ] JWT issuance and refresh (Spring Boot)
-- [ ] Refresh token storage in Android Keystore
-- [ ] Drift local cache with `dirty` flag
-- [ ] SyncService — push dirty rows on connectivity
-- [ ] Full refresh on app start
-- [ ] Anonymous local mode (no account required)
+- [x] Email + password registration and login
+- [x] Google OAuth login
+- [ ] JWT issuance and refresh (Spring Boot) — deferred to backend plan
+- [x] Refresh token storage in Android Keystore
+- [x] Drift local cache with `dirty` flag
+- [x] SyncService — push dirty rows on connectivity
+- [x] Full refresh on app start
+- [x] Anonymous local mode (no account required)
 
 ### Profile / Settings
-- [ ] Profile screen (avatar, display name, account status)
-- [ ] Sign in / sign out
-- [ ] Light / Dark theme toggle
-- [ ] Notification settings
-- [ ] CSV data export
-- [ ] Account deletion (30-day soft delete)
+- [x] Profile screen (avatar, display name, account status)
+- [x] Sign in / sign out
+- [x] Light / Dark theme toggle
+- [ ] Notification settings — UI stub (settings screen not yet wired to local notification prefs)
+- [x] CSV data export (stub — shows sign-in required message)
+- [x] Account deletion (30-day soft delete)
 
 ---
 

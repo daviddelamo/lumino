@@ -28,9 +28,10 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
 
   Future<void> _register() async {
     setState(() { _loading = true; _error = null; });
+    final router = GoRouter.of(context);
     try {
       await ref.read(_authServiceProvider).register(_emailCtrl.text.trim(), _passwordCtrl.text);
-      if (context.mounted) context.go('/today');
+      if (mounted) router.go('/today');
     } catch (e) {
       if (mounted) setState(() { _error = e.toString(); _loading = false; });
     }

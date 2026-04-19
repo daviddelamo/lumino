@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/lumino}
+    username: ${DATABASE_USERNAME:lumino}
+    password: ${DATABASE_PASSWORD:lumino}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+jwt:
+  secret: ${JWT_SECRET:dGhpcy1pcy1hLTI1Ni1iaXQtc2VjcmV0LWtleS1mb3ItbHVtaW5vLWFwcA==}
+  access-token-expiry-ms: 900000
+  refresh-token-expiry-days: 30
+
+server:
+  port: ${PORT:8080}
+
+google:
+  client-id: ${GOOGLE_CLIENT_ID:}

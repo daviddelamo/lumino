@@ -98,6 +98,13 @@ class _TodayHeader extends StatelessWidget {
             ),
           ),
           ProgressRing(completed: completed, total: tasks.length, size: 48),
+          const SizedBox(width: 8),
+          IconButton(
+            icon: const Icon(Icons.calendar_view_week_outlined,
+                color: Color(0xFFA08070)),
+            onPressed: () => GoRouter.of(context).go('/today/week'),
+            tooltip: 'Week view',
+          ),
         ],
       ),
     );

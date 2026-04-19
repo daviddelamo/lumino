@@ -7,6 +7,7 @@ import 'features/onboarding/screens/routine_preview_screen.dart';
 import 'features/onboarding/screens/notifications_screen.dart';
 import 'features/onboarding/screens/signup_screen.dart';
 import 'features/today/screens/today_screen.dart';
+import 'features/today/screens/week_view_screen.dart';
 import 'features/habits/screens/habits_screen.dart';
 import 'features/habits/screens/habit_form_screen.dart';
 import 'features/habits/screens/habit_detail_screen.dart';
@@ -23,6 +24,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/onboarding/notifications', builder: (c, s) => const NotificationsScreen()),
       GoRoute(path: '/onboarding/signup', builder: (c, s) => const SignupScreen()),
       GoRoute(path: '/today', builder: (c, s) => const TodayScreen()),
+      GoRoute(path: '/today/week', builder: (c, s) => const WeekViewScreen()),
       GoRoute(path: '/habits', builder: (c, s) => const HabitsScreen()),
       GoRoute(path: '/habits/add', builder: (c, s) => const HabitFormScreen()),
       GoRoute(path: '/habits/:id', builder: (c, s) => HabitDetailScreen(habitId: s.pathParameters['id']!)),
