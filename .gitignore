@@ -1,0 +1,51 @@
+# ─── General ────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.log
+*.swp
+*.orig
+
+# ─── IDE ────────────────────────────────────────────────────────────────────
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# ─── Flutter / Dart ──────────────────────────────────────────────────────────
+lumino-app/.dart_tool/
+lumino-app/.flutter-plugins
+lumino-app/.flutter-plugins-dependencies
+lumino-app/.pub-cache/
+lumino-app/.pub/
+lumino-app/build/
+lumino-app/**/doc/api/
+lumino-app/app.*.symbols
+lumino-app/app.*.map.json
+
+# Android build outputs & local config
+lumino-app/android/.gradle/
+lumino-app/android/captures/
+lumino-app/android/local.properties
+lumino-app/android/app/debug/
+lumino-app/android/app/profile/
+lumino-app/android/app/release/
+lumino-app/android/GeneratedPluginRegistrant.java
+
+# Android signing — never commit keystores
+lumino-app/android/key.properties
+lumino-app/**/*.keystore
+lumino-app/**/*.jks
+
+# ─── Spring Boot / Gradle ────────────────────────────────────────────────────
+lumino-api/.gradle/
+lumino-api/build/
+lumino-api/out/
+*.class
+
+# Environment — keep .env.example, ignore actual secrets
+lumino-api/.env
+
+# ─── Docker ──────────────────────────────────────────────────────────────────
+# Keep docker-compose files; ignore local override
+docker-compose.override.yml
