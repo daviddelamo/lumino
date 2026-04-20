@@ -27,6 +27,15 @@ class SecurityConfig(private val jwtAuthFilter: JwtAuthFilter) {
                 }
             }
             .authorizeHttpRequests {
+                it.requestMatchers(
+                    "/",
+                    "/*.html",
+                    "/*.css",
+                    "/*.js",
+                    "/assets/**",
+                    "/*.png",
+                    "/*.ico"
+                ).permitAll()
                 it.requestMatchers("/api/auth/**").permitAll()
                 it.anyRequest().authenticated()
             }
