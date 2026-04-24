@@ -4,8 +4,11 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../tasks_provider.dart';
 import '../task_form_sheet.dart';
+import '../../../shared/widgets/lumino_icon.dart';
 import '../../../shared/widgets/progress_ring.dart';
 import '../../../shared/widgets/empty_state.dart';
+import '../../../shared/widgets/skeleton_card.dart';
+import '../../../shared/widgets/lumino_nav_bar.dart';
 import '../../../theme.dart';
 import '../../../database/database.dart';
 
@@ -14,11 +17,12 @@ class TodayScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final today = DateTime.now();
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
     final tasksAsync = ref.watch(tasksNotifierProvider(today));
 
     return Scaffold(
-      backgroundColor: LuminoTheme.backgroundWarm,
+      backgroundColor: LuminoTheme.bg(context),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -26,7 +30,11 @@ class TodayScreen extends ConsumerWidget {
             _TodayHeader(date: today, tasksAsync: tasksAsync),
             Expanded(
               child: tasksAsync.when(
-                loading: () => const Center(child: CircularProgressIndicator()),
+                loading: () => ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  itemCount: 3,
+                  itemBuilder: (_, __) => const SkeletonCard(),
+                ),
                 error: (e, _) => Center(child: Text('Error: $e')),
                 data: (tasks) => tasks.isEmpty
                     ? EmptyState(
@@ -36,7 +44,7 @@ class TodayScreen extends ConsumerWidget {
                         onAction: () => _showAddTask(context, ref, today),
                         actionLabel: 'Add task',
                       )
-                    : _Timeline(tasks: tasks, date: today, ref: ref),
+                    : _TaskGroups(tasks: tasks, date: today),
               ),
             ),
           ],
@@ -45,9 +53,11 @@ class TodayScreen extends ConsumerWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddTask(context, ref, today),
         backgroundColor: LuminoTheme.primaryColor,
-        child: const Icon(Icons.add, color: Colors.white),
+        foregroundColor: Colors.white,
+        elevation: 2,
+        child: const Icon(Icons.add),
       ),
-      bottomNavigationBar: const _BottomNav(currentIndex: 0),
+      bottomNavigationBar: const LuminoNavBar(currentIndex: 0),
     );
   }
 
@@ -73,122 +83,179 @@ class _TodayHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final tasks = tasksAsync.valueOrNull ?? [];
     final completed = tasks.where((t) => t.completedAt != null).length;
+    final total = tasks.length;
+
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
-      child: Row(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  DateFormat('EEEE, MMM d').format(date),
-                  style: const TextStyle(
-                      color: Color(0xFFA08070), fontSize: 13, letterSpacing: 0.5),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      DateFormat('EEEE, MMMM d').format(date),
+                      style: Theme.of(context).textTheme.labelMedium,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      _greeting(date.hour),
+                      style: Theme.of(context).textTheme.displaySmall,
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  _greeting(date.hour),
-                  style: Theme.of(context)
-                      .textTheme
-                      .headlineMedium
-                      ?.copyWith(fontSize: 22, color: const Color(0xFF3A2A1A)),
-                ),
-              ],
+              ),
+              const SizedBox(width: 16),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  GestureDetector(
+                    onTap: () => GoRouter.of(context).go('/today/week'),
+                    child: ProgressRing(
+                      completed: completed,
+                      total: total,
+                      size: 52,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    total == 0 ? 'No tasks' : '$completed/$total',
+                    style: Theme.of(context).textTheme.labelSmall,
+                  ),
+                ],
+              ),
+            ],
+          ),
+          if (total > 0 && completed == total) ...[
+            const SizedBox(height: 8),
+            Text(
+              'All done — great work today.',
+              style: Theme.of(context)
+                  .textTheme
+                  .bodySmall
+                  ?.copyWith(color: LuminoTheme.primaryColor),
             ),
-          ),
-          ProgressRing(completed: completed, total: tasks.length, size: 48),
-          const SizedBox(width: 8),
-          IconButton(
-            icon: const Icon(Icons.calendar_view_week_outlined,
-                color: Color(0xFFA08070)),
-            onPressed: () => GoRouter.of(context).go('/today/week'),
-            tooltip: 'Week view',
-          ),
+          ],
         ],
       ),
     );
   }
 
   static String _greeting(int hour) {
-    if (hour < 12) return 'Good morning ☀️';
-    if (hour < 17) return 'Good afternoon 🌤️';
-    return 'Good evening 🌙';
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    return 'Good evening';
   }
 }
 
-class _Timeline extends StatelessWidget {
+enum _TimeBlock { morning, afternoon, evening }
+
+extension _TimeBlockExt on _TimeBlock {
+  String get label {
+    switch (this) {
+      case _TimeBlock.morning:
+        return 'Morning';
+      case _TimeBlock.afternoon:
+        return 'Afternoon';
+      case _TimeBlock.evening:
+        return 'Evening';
+    }
+  }
+
+  IconData get icon {
+    switch (this) {
+      case _TimeBlock.morning:
+        return Icons.wb_sunny_outlined;
+      case _TimeBlock.afternoon:
+        return Icons.wb_cloudy_outlined;
+      case _TimeBlock.evening:
+        return Icons.nights_stay_outlined;
+    }
+  }
+
+  static _TimeBlock forHour(int hour) {
+    if (hour < 12) return _TimeBlock.morning;
+    if (hour < 17) return _TimeBlock.afternoon;
+    return _TimeBlock.evening;
+  }
+}
+
+class _TaskGroups extends StatelessWidget {
   final List<Task> tasks;
   final DateTime date;
-  final WidgetRef ref;
 
-  const _Timeline({required this.tasks, required this.date, required this.ref});
+  const _TaskGroups({required this.tasks, required this.date});
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      itemCount: tasks.length,
-      itemBuilder: (context, i) => _TaskCard(task: tasks[i], date: date, ref: ref),
+    final grouped = <_TimeBlock, List<Task>>{};
+    for (final task in tasks) {
+      final block = _TimeBlockExt.forHour(task.startAt.hour);
+      grouped.putIfAbsent(block, () => []).add(task);
+    }
+
+    final sections = <Widget>[];
+    for (final block in _TimeBlock.values) {
+      final blockTasks = grouped[block];
+      if (blockTasks == null || blockTasks.isEmpty) continue;
+      sections.add(_TimeBlockSection(block: block, tasks: blockTasks, date: date));
+    }
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(20, 4, 20, 96),
+      children: sections,
     );
   }
 }
 
-class _TaskCard extends StatelessWidget {
-  final Task task;
+class _TimeBlockSection extends StatelessWidget {
+  final _TimeBlock block;
+  final List<Task> tasks;
   final DateTime date;
-  final WidgetRef ref;
 
-  const _TaskCard({required this.task, required this.date, required this.ref});
+  const _TimeBlockSection({
+    required this.block,
+    required this.tasks,
+    required this.date,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final isDone = task.completedAt != null;
-    final color = _parseColor(task.color);
-    return Opacity(
-      opacity: isDone ? 0.5 : 1.0,
-      child: Card(
-        margin: const EdgeInsets.only(bottom: 8),
-        child: ListTile(
-          leading: CircleAvatar(
-            backgroundColor: color.withOpacity(0.15),
-            child: Icon(Icons.circle, color: color, size: 14),
-          ),
-          title: Text(
-            task.title,
-            style: TextStyle(
-              decoration: isDone ? TextDecoration.lineThrough : null,
-              fontWeight: FontWeight.w600,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 20),
+        Row(
+          children: [
+            Icon(block.icon, size: 14, color: LuminoTheme.textSecondary(context)),
+            const SizedBox(width: 6),
+            Text(
+              block.label,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    letterSpacing: 0.5,
+                  ),
             ),
-          ),
-          subtitle: Text(DateFormat('HH:mm').format(task.startAt)),
-          trailing: GestureDetector(
-            onTap: () {
-              if (!isDone) {
-                ref.read(tasksNotifierProvider(date).notifier).completeTask(task.id);
-              }
-            },
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              width: 26,
-              height: 26,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isDone ? LuminoTheme.primaryColor : Colors.transparent,
-                border: Border.all(
-                  color: isDone ? LuminoTheme.primaryColor : const Color(0xFFD0B898),
-                  width: 2,
-                ),
-              ),
-              child: isDone
-                  ? const Icon(Icons.check, color: Colors.white, size: 14)
-                  : null,
-            ),
-          ),
+          ],
         ),
-      ),
+        const SizedBox(height: 10),
+        ...tasks.map((t) => Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: _TaskCard(task: t, date: date),
+            )),
+      ],
     );
   }
+}
+
+class _TaskCard extends ConsumerWidget {
+  final Task task;
+  final DateTime date;
+
+  const _TaskCard({required this.task, required this.date});
 
   static Color _parseColor(String hex) {
     try {
@@ -197,25 +264,115 @@ class _TaskCard extends StatelessWidget {
       return LuminoTheme.primaryColor;
     }
   }
-}
 
-class _BottomNav extends StatelessWidget {
-  final int currentIndex;
-  const _BottomNav({required this.currentIndex});
+  static String _durationLabel(Task task) {
+    final time = DateFormat('HH:mm').format(task.startAt);
+    final end = task.endAt;
+    if (end != null) {
+      final diffMin = end.difference(task.startAt).inMinutes;
+      if (diffMin > 0) return '$time · ${diffMin}m';
+    }
+    return time;
+  }
+
+  void _openEdit(BuildContext context, WidgetRef ref) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => TaskFormSheet(
+        date: date,
+        existing: task,
+        onSaved: () => ref.read(tasksNotifierProvider(date).notifier).reload(),
+      ),
+    );
+  }
+
+  void _toggle(WidgetRef ref) {
+    if (task.completedAt != null) {
+      ref.read(tasksNotifierProvider(date).notifier).uncompleteTask(task.id);
+    } else {
+      ref.read(tasksNotifierProvider(date).notifier).completeTask(task.id);
+    }
+  }
 
   @override
-  Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      currentIndex: currentIndex,
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: 'Today'),
-        BottomNavigationBarItem(icon: Icon(Icons.check_circle_outline), label: 'Habits'),
-        BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Me'),
-      ],
-      onTap: (i) {
-        if (i == 1) context.go('/habits');
-        if (i == 2) context.go('/me');
-      },
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isDone = task.completedAt != null;
+    final color = _parseColor(task.color);
+
+    return AnimatedOpacity(
+      opacity: isDone ? 0.55 : 1.0,
+      duration: const Duration(milliseconds: 200),
+      child: Material(
+        color: LuminoTheme.surface(context),
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () => _openEdit(context, ref),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+            child: Row(
+              children: [
+                // Icon in rounded square with color tint
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Center(
+                    child: LuminoIcon(task.iconId, size: 20, color: color),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        task.title,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              decoration:
+                                  isDone ? TextDecoration.lineThrough : null,
+                              decorationColor:
+                                  LuminoTheme.textSecondary(context),
+                            ),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        _durationLabel(task),
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => _toggle(ref),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    width: 28,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isDone ? color : Colors.transparent,
+                      border: Border.all(
+                        color: isDone ? color : color.withValues(alpha: 0.3),
+                        width: 2,
+                      ),
+                    ),
+                    child: isDone
+                        ? const Icon(Icons.check, color: Colors.white, size: 14)
+                        : null,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

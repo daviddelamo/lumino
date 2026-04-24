@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import '../../../database/database.dart';
 import '../../../features/today/tasks_provider.dart';
+import '../../../shared/widgets/lumino_icon.dart';
 import '../habits_provider.dart';
 import '../../../theme.dart';
 
@@ -45,6 +47,7 @@ class _HabitDetailScreenState extends ConsumerState<HabitDetailScreen> {
     final h = _habit!;
     final entryDates = _entries.map((e) => e.entryDate).toList();
     final streak = computeStreak(entryDates);
+    final longest = longestStreak(entryDates);
     final now = DateTime.now();
     final monthStart = DateTime(now.year, now.month, 1);
     final thisMonthEntries =
@@ -53,55 +56,45 @@ class _HabitDetailScreenState extends ConsumerState<HabitDetailScreen> {
     final completionPct = (thisMonthEntries / daysInMonth * 100).round();
 
     return Scaffold(
-      backgroundColor: LuminoTheme.backgroundWarm,
+      backgroundColor: LuminoTheme.bg(context),
       appBar: AppBar(
-        backgroundColor: LuminoTheme.backgroundWarm,
-        title: Text(h.title),
+        backgroundColor: LuminoTheme.bg(context),
+        title: Text(h.title, style: Theme.of(context).textTheme.titleLarge),
         elevation: 0,
+        scrolledUnderElevation: 0,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                _StatBox(value: '$streak', label: 'Streak'),
-                const SizedBox(width: 10),
-                _StatBox(value: '${longestStreak(entryDates)}', label: 'Best'),
-                const SizedBox(width: 10),
-                _StatBox(value: '$completionPct%', label: 'This month'),
-              ],
+            _StatsStrip(
+              streak: streak,
+              longest: longest,
+              completionPct: completionPct,
             ),
-            const SizedBox(height: 24),
-            const Text('Last 30 days',
-                style: TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFFA08070),
+            const SizedBox(height: 32),
+            Text(
+              'Last 30 days',
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
                     letterSpacing: 1,
-                    fontWeight: FontWeight.w600)),
-            const SizedBox(height: 10),
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
+            const SizedBox(height: 12),
             _Heatmap(entries: _entries),
-            const SizedBox(height: 24),
-            const Text('Recent entries',
-                style: TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFFA08070),
-                    letterSpacing: 1,
-                    fontWeight: FontWeight.w600)),
-            const SizedBox(height: 8),
-            ..._entries.take(10).map((e) => ListTile(
-                  leading: const CircleAvatar(
-                      backgroundColor: LuminoTheme.primaryColor, radius: 5),
-                  title: Text(
-                    '${e.entryDate.year}-${e.entryDate.month.toString().padLeft(2, '0')}-${e.entryDate.day.toString().padLeft(2, '0')}',
-                    style: const TextStyle(fontSize: 13),
-                  ),
-                  trailing: Text(
-                    '${e.value.toInt()}${h.unit != null ? ' ${h.unit}' : ''}  \u2713',
-                    style: const TextStyle(fontSize: 12, color: Color(0xFFA08070)),
-                  ),
-                )),
+            const SizedBox(height: 32),
+            if (_entries.isNotEmpty) ...[
+              Text(
+                'Recent entries',
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      letterSpacing: 1,
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+              const SizedBox(height: 8),
+              ..._entries.take(10).map((e) => _EntryRow(entry: e, habit: h)),
+            ],
           ],
         ),
       ),
@@ -109,31 +102,89 @@ class _HabitDetailScreenState extends ConsumerState<HabitDetailScreen> {
   }
 }
 
-class _StatBox extends StatelessWidget {
-  final String value, label;
-  const _StatBox({required this.value, required this.label});
+class _StatsStrip extends StatelessWidget {
+  final int streak;
+  final int longest;
+  final int completionPct;
+
+  const _StatsStrip({
+    required this.streak,
+    required this.longest,
+    required this.completionPct,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        _Stat(value: '$streak', label: 'Streak'),
+        _VerticalDivider(),
+        _Stat(value: '$longest', label: 'Best'),
+        _VerticalDivider(),
+        _Stat(value: '$completionPct%', label: 'This month'),
+      ],
+    );
+  }
+}
+
+class _Stat extends StatelessWidget {
+  final String value;
+  final String label;
+  const _Stat({required this.value, required this.label});
 
   @override
   Widget build(BuildContext context) => Expanded(
-        child: Card(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            child: Column(
-              children: [
-                Text(value,
-                    style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFFE8823A),
-                        fontFamily: 'Georgia')),
-                Text(label,
-                    style:
-                        const TextStyle(fontSize: 10, color: Color(0xFFA08070))),
-              ],
+        child: Column(
+          children: [
+            Text(
+              value,
+              style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                    color: LuminoTheme.primaryColor,
+                    fontWeight: FontWeight.w700,
+                  ),
             ),
-          ),
+            const SizedBox(height: 2),
+            Text(label, style: Theme.of(context).textTheme.labelSmall),
+          ],
         ),
       );
+}
+
+class _VerticalDivider extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) => Container(
+        width: 1,
+        height: 40,
+        color: LuminoTheme.divider(context),
+        margin: const EdgeInsets.symmetric(horizontal: 8),
+      );
+}
+
+class _EntryRow extends StatelessWidget {
+  final HabitEntry entry;
+  final Habit habit;
+  const _EntryRow({required this.entry, required this.habit});
+
+  @override
+  Widget build(BuildContext context) {
+    final label = DateFormat('EEE, MMM d').format(entry.entryDate);
+    final value =
+        '${entry.value.toInt()}${habit.unit != null ? ' ${habit.unit}' : ''}';
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        children: [
+          LuminoIcon(habit.iconId,
+              size: 16, color: LuminoTheme.textSecondary(context)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(label, style: Theme.of(context).textTheme.bodyMedium),
+          ),
+          Text('$value  ✓', style: Theme.of(context).textTheme.bodySmall),
+        ],
+      ),
+    );
+  }
 }
 
 class _Heatmap extends StatelessWidget {
@@ -143,6 +194,7 @@ class _Heatmap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
     final entrySet = entries.map((e) {
       final d = e.entryDate;
       return DateTime(d.year, d.month, d.day);
@@ -152,16 +204,24 @@ class _Heatmap extends StatelessWidget {
       crossAxisCount: 10,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: 3,
-      crossAxisSpacing: 3,
+      mainAxisSpacing: 5,
+      crossAxisSpacing: 5,
       children: List.generate(30, (i) {
         final day = now.subtract(Duration(days: 29 - i));
         final norm = DateTime(day.year, day.month, day.day);
         final done = entrySet.contains(norm);
-        return Container(
-          decoration: BoxDecoration(
-            color: done ? LuminoTheme.primaryColor : const Color(0xFFF0E0D0),
-            borderRadius: BorderRadius.circular(3),
+        final isToday = norm == today;
+        return Tooltip(
+          message: DateFormat('MMM d').format(day),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            decoration: BoxDecoration(
+              color: done ? LuminoTheme.primaryColor : LuminoTheme.divider(context),
+              borderRadius: BorderRadius.circular(4),
+              border: isToday
+                  ? Border.all(color: LuminoTheme.primaryColor, width: 1.5)
+                  : null,
+            ),
           ),
         );
       }),
