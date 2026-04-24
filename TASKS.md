@@ -22,8 +22,8 @@
 
 ### Phase 2 — Widgets
 
-- [ ] **Home-screen widget (2×2 and 4×2)** - lumino-app: Android home-screen widget showing today's tasks
-- [ ] **Quick-complete from widget** - lumino-app: tap to complete a task directly from the widget
+- [x] **Home-screen widget (2×2 and 4×2)** - lumino-app: Android home-screen widget showing today's tasks
+- [x] **Quick-complete from widget** - lumino-app: tap to complete a task directly from the widget
 
 ### Phase 2 — Statistics
 
