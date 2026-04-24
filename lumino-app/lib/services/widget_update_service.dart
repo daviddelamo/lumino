@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,6 +9,11 @@ typedef WidgetSaver = Future<void> Function(String key, String value);
 typedef WidgetUpdater = Future<void> Function();
 
 class WidgetUpdateService {
+  static const String _keyType   = 'lumino_widget_type';
+  static const String _keyCount  = 'lumino_widget_count';
+  static const String _keyUserId = 'lumino_widget_user_id';
+  static const String _keyItems  = 'lumino_widget_items';
+
   final AppDatabase _db;
   final WidgetSaver _save;
   final WidgetUpdater _update;
@@ -25,25 +31,33 @@ class WidgetUpdateService {
             });
 
   Future<void> refreshFromPrefs() async {
-    final prefs = await SharedPreferences.getInstance();
-    final type = prefs.getString('lumino_widget_type') ?? 'tasks';
-    final count = prefs.getInt('lumino_widget_count') ?? 5;
-    final userId = prefs.getString('lumino_widget_user_id') ?? 'local';
-    await refresh(type: type, count: count, userId: userId);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final type   = prefs.getString(_keyType)   ?? 'tasks';
+      final count  = prefs.getInt(_keyCount)      ?? 5;
+      final userId = prefs.getString(_keyUserId)  ?? 'local';
+      await refresh(type: type, count: count, userId: userId);
+    } catch (e, st) {
+      // Widget update failed; leave the current widget data intact.
+      debugPrint('WidgetUpdateService.refreshFromPrefs: $e\n$st');
+    }
   }
 
+  /// Fetches today's [type] items and pushes them to the home-screen widgets.
+  /// Pass [count] = 0 to return all items without a limit.
   Future<void> refresh({
     required String type,
     required int count,
     required String userId,
   }) async {
+    assert(type == 'tasks' || type == 'habits', 'Unknown widget type: $type');
     final List<Map<String, dynamic>> items;
     if (type == 'tasks') {
       items = await _buildTaskItems(userId, count);
     } else {
       items = await _buildHabitItems(userId, count);
     }
-    await _save('lumino_widget_items', jsonEncode(items));
+    await _save(_keyItems, jsonEncode(items));
     await _update();
   }
 

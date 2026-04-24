@@ -4,6 +4,7 @@ import 'package:lumino_app/services/widget_update_service.dart';
 import 'package:lumino_app/database/database.dart';
 import 'package:lumino_app/database/daos/task_dao.dart';
 import 'package:lumino_app/database/daos/habit_dao.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 class MockAppDatabase extends Mock implements AppDatabase {}
@@ -141,5 +142,34 @@ void main() {
     final itemsIndex = savedKeys.indexOf('lumino_widget_items');
     final items = jsonDecode(savedValues[itemsIndex]) as List;
     expect(items.length, 8);
+  });
+
+  test('refreshFromPrefs reads prefs and updates widget', () async {
+    SharedPreferences.setMockInitialValues({
+      'lumino_widget_type': 'tasks',
+      'lumino_widget_count': 3,
+      'lumino_widget_user_id': 'u1',
+    });
+
+    final task = Task(
+      id: 'task-prefs-1',
+      userId: 'u1',
+      title: 'Prefs task',
+      iconId: 'circle',
+      color: '#E8823A',
+      startAt: DateTime(2026, 4, 24, 9, 0),
+      updatedAt: DateTime(2026, 4, 24),
+      dirty: false,
+    );
+    when(() => taskDao.getTasksForDay(any(), any())).thenAnswer((_) async => [task]);
+
+    final service = makeService();
+    await service.refreshFromPrefs();
+
+    final itemsIndex = savedKeys.indexOf('lumino_widget_items');
+    expect(itemsIndex, isNot(-1));
+    final items = jsonDecode(savedValues[itemsIndex]) as List;
+    expect(items.length, 1);
+    expect(updateCallCount, 1);
   });
 }
