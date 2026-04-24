@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="lumino_background">#FFF8F2</color>
+    <color name="widget_background">#FFFFFFFF</color>
+    <color name="widget_text_primary">#FF1A1A1A</color>
+    <color name="widget_text_secondary">#FF666666</color>
+    <color name="widget_primary">#FFE8823A</color>
+    <color name="widget_surface">#FFF5F5F5</color>
 </resources>
