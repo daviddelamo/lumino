@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart' hide Column;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../database/database.dart';
+import '../../services/widget_update_service.dart';
 import '../today/tasks_provider.dart';
 
 class HabitWithStatus {
@@ -19,8 +20,10 @@ final habitsProvider = FutureProvider<List<Habit>>((ref) async {
 class HabitsNotifier extends StateNotifier<AsyncValue<List<HabitWithStatus>>> {
   final AppDatabase _db;
   final String _userId;
+  late final WidgetUpdateService _widgetService;
 
   HabitsNotifier(this._db, this._userId) : super(const AsyncValue.loading()) {
+    _widgetService = WidgetUpdateService(_db);
     _load();
   }
 
@@ -68,6 +71,7 @@ class HabitsNotifier extends StateNotifier<AsyncValue<List<HabitWithStatus>>> {
       unit: Value(unit),
     ));
     await _load();
+    await _widgetService.refreshFromPrefs();
   }
 
   Future<void> completeToday(String habitId, double value) async {
@@ -79,6 +83,7 @@ class HabitsNotifier extends StateNotifier<AsyncValue<List<HabitWithStatus>>> {
       value: Value(value),
     ));
     await _load();
+    await _widgetService.refreshFromPrefs();
   }
 
   Future<void> uncompleteToday(String habitId) async {
@@ -86,6 +91,7 @@ class HabitsNotifier extends StateNotifier<AsyncValue<List<HabitWithStatus>>> {
     final entryDate = DateTime(today.year, today.month, today.day);
     await _db.habitDao.deleteEntry(habitId, entryDate);
     await _load();
+    await _widgetService.refreshFromPrefs();
   }
 
   Future<void> reload() => _load();

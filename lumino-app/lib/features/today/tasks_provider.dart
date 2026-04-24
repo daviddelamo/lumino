@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../database/database.dart';
 import '../../services/auth_state.dart';
+import '../../services/widget_update_service.dart';
 
 final dbProvider = Provider<AppDatabase>((ref) => AppDatabase());
 final currentUserIdProvider = Provider<String?>((ref) => ref.watch(authProvider).userId);
@@ -16,8 +17,10 @@ class TasksNotifier extends StateNotifier<AsyncValue<List<Task>>> {
   final AppDatabase _db;
   final String _userId;
   final DateTime _date;
+  late final WidgetUpdateService _widgetService;
 
   TasksNotifier(this._db, this._userId, this._date) : super(const AsyncValue.loading()) {
+    _widgetService = WidgetUpdateService(_db);
     _load();
   }
 
@@ -28,16 +31,19 @@ class TasksNotifier extends StateNotifier<AsyncValue<List<Task>>> {
   Future<void> completeTask(String taskId) async {
     await _db.taskDao.markComplete(taskId, DateTime.now());
     await _load();
+    await _widgetService.refreshFromPrefs();
   }
 
   Future<void> uncompleteTask(String taskId) async {
     await _db.taskDao.markIncomplete(taskId);
     await _load();
+    await _widgetService.refreshFromPrefs();
   }
 
   Future<void> deleteTask(String taskId) async {
     await _db.taskDao.softDelete(taskId);
     await _load();
+    await _widgetService.refreshFromPrefs();
   }
 
   Future<void> reload() => _load();
