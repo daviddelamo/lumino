@@ -22,14 +22,15 @@ class SyncService {
 
   void dispose() => _connectivitySub.cancel();
 
-  Future<void> sync() async {
+  Future<void> sync({String? userId}) async {
     if (_syncing) return;
     _syncing = true;
     try {
-      final isLoggedIn = await _api.getAccessToken() != null;
-      if (!isLoggedIn) return;
+      final token = await _api.getAccessToken();
+      if (token == null) return;
+      final uid = userId ?? 'local';
       await _pushDirtyTasks();
-      await _pullLatest();
+      await _pullLatest(uid);
     } finally {
       _syncing = false;
     }
@@ -46,10 +47,10 @@ class SyncService {
             'title': task.title,
             'iconId': task.iconId,
             'color': task.color,
-            'startAt': task.startAt.toIso8601String(),
-            if (task.endAt != null) 'endAt': task.endAt!.toIso8601String(),
+            'startAt': task.startAt.toUtc().toIso8601String(),
+            if (task.endAt != null) 'endAt': task.endAt!.toUtc().toIso8601String(),
             if (task.completedAt != null)
-              'completedAt': task.completedAt!.toIso8601String(),
+              'completedAt': task.completedAt!.toUtc().toIso8601String(),
           });
         }
         await _db.taskDao.markSynced(task.id);
@@ -59,7 +60,7 @@ class SyncService {
     }
   }
 
-  Future<void> _pullLatest() async {
+  Future<void> _pullLatest(String userId) async {
     try {
       final tasksRes = await _api.get('/api/tasks',
           queryParameters: {'date': _todayString()});
@@ -69,16 +70,16 @@ class SyncService {
       if (list is! List) return;
       for (final t in list) {
         if (t is! Map<String, dynamic>) continue;
-        await _db.taskDao.insertTask(_taskFromJson(t));
+        await _db.taskDao.insertTask(_taskFromJson(t, userId));
       }
     } on DioException catch (_) {}
   }
 
   String _todayString() => DateFormat('yyyy-MM-dd').format(DateTime.now());
 
-  TasksCompanion _taskFromJson(Map<String, dynamic> t) {
+  TasksCompanion _taskFromJson(Map<String, dynamic> t, String userId) {
     return TasksCompanion.insert(
-      userId: 'me',
+      userId: userId,
       title: t['title'] as String,
       iconId: Value(t['iconId'] as String? ?? 'circle'),
       color: Value(t['color'] as String? ?? '#E8823A'),

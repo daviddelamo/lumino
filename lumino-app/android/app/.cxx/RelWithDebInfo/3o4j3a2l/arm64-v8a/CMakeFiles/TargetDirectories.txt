@@ -1,0 +1,2 @@
+/home/ddelamo/proyectos/diary/lumino-app/android/app/.cxx/RelWithDebInfo/3o4j3a2l/arm64-v8a/CMakeFiles/edit_cache.dir
+/home/ddelamo/proyectos/diary/lumino-app/android/app/.cxx/RelWithDebInfo/3o4j3a2l/arm64-v8a/CMakeFiles/rebuild_cache.dir

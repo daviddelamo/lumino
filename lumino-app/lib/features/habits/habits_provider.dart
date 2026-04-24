@@ -3,13 +3,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../database/database.dart';
 import '../today/tasks_provider.dart';
 
+class HabitWithStatus {
+  final Habit habit;
+  final bool completedToday;
+  final int streak;
+  const HabitWithStatus(this.habit, {required this.completedToday, this.streak = 0});
+}
+
 final habitsProvider = FutureProvider<List<Habit>>((ref) async {
   final db = ref.watch(dbProvider);
   final userId = ref.watch(currentUserIdProvider) ?? 'local';
   return db.habitDao.getActiveHabits(userId);
 });
 
-class HabitsNotifier extends StateNotifier<AsyncValue<List<Habit>>> {
+class HabitsNotifier extends StateNotifier<AsyncValue<List<HabitWithStatus>>> {
   final AppDatabase _db;
   final String _userId;
 
@@ -18,7 +25,24 @@ class HabitsNotifier extends StateNotifier<AsyncValue<List<Habit>>> {
   }
 
   Future<void> _load() async {
-    state = await AsyncValue.guard(() => _db.habitDao.getActiveHabits(_userId));
+    state = await AsyncValue.guard(() async {
+      final habits = await _db.habitDao.getActiveHabits(_userId);
+      final today = DateTime.now();
+      final todayNorm = DateTime(today.year, today.month, today.day);
+      final entries = await _db.habitDao
+          .getEntriesForDate(habits.map((h) => h.id).toList(), todayNorm);
+      final completedIds = entries.map((e) => e.habitId).toSet();
+      final withStreaks = await Future.wait(habits.map((h) async {
+        final allEntries = await _db.habitDao.getAllEntries(h.id);
+        final dates = allEntries.map((e) => e.entryDate).toList();
+        return HabitWithStatus(
+          h,
+          completedToday: completedIds.contains(h.id),
+          streak: computeStreak(dates),
+        );
+      }));
+      return withStreaks;
+    });
   }
 
   Future<void> addHabit({
@@ -57,11 +81,18 @@ class HabitsNotifier extends StateNotifier<AsyncValue<List<Habit>>> {
     await _load();
   }
 
+  Future<void> uncompleteToday(String habitId) async {
+    final today = DateTime.now();
+    final entryDate = DateTime(today.year, today.month, today.day);
+    await _db.habitDao.deleteEntry(habitId, entryDate);
+    await _load();
+  }
+
   Future<void> reload() => _load();
 }
 
 final habitsNotifierProvider =
-    StateNotifierProvider<HabitsNotifier, AsyncValue<List<Habit>>>(
+    StateNotifierProvider<HabitsNotifier, AsyncValue<List<HabitWithStatus>>>(
   (ref) {
     final db = ref.watch(dbProvider);
     final userId = ref.watch(currentUserIdProvider) ?? 'local';

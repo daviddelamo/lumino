@@ -22,6 +22,16 @@ class HabitDao extends DatabaseAccessor<AppDatabase> with _$HabitDaoMixin {
   Future<void> upsertEntry(HabitEntriesCompanion entry) =>
       into(habitEntries).insert(entry, mode: InsertMode.insertOrReplace);
 
+  Future<void> deleteEntry(String habitId, DateTime date) =>
+      (delete(habitEntries)
+            ..where((e) => e.habitId.equals(habitId) & e.entryDate.equals(date)))
+          .go();
+
+  Future<List<HabitEntry>> getEntriesForDate(List<String> habitIds, DateTime date) =>
+      (select(habitEntries)
+            ..where((e) => e.habitId.isIn(habitIds) & e.entryDate.equals(date)))
+          .get();
+
   Future<List<HabitEntry>> getEntries(
           String habitId, DateTime from, DateTime to) =>
       (select(habitEntries)

@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'features/splash/splash_screen.dart';
 import 'features/onboarding/screens/welcome_screen.dart';
 import 'features/onboarding/screens/goals_screen.dart';
 import 'features/onboarding/screens/quiz_screen.dart';
@@ -15,8 +16,9 @@ import 'features/me/screens/me_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/onboarding/welcome',
+    initialLocation: '/splash',
     routes: [
+      GoRoute(path: '/splash', builder: (c, s) => const SplashScreen()),
       GoRoute(path: '/onboarding/welcome', builder: (c, s) => const WelcomeScreen()),
       GoRoute(path: '/onboarding/goals', builder: (c, s) => const GoalsScreen()),
       GoRoute(path: '/onboarding/quiz', builder: (c, s) => const QuizScreen()),

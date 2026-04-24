@@ -23,7 +23,7 @@ class GoalsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selected = ref.watch(onboardingProvider).selectedGoals;
     return Scaffold(
-      backgroundColor: LuminoTheme.backgroundWarm,
+      backgroundColor: LuminoTheme.bg(context),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -31,7 +31,16 @@ class GoalsScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const _StepIndicator(current: 2, total: 6),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
+              Center(
+                child: Image.asset(
+                  'assets/images/onboarding_goals.png',
+                  height: 160,
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, __, ___) => const SizedBox(height: 160),
+                ),
+              ),
+              const SizedBox(height: 16),
               Text('What do you want\nto work on?',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     color: const Color(0xFF3A2A1A),

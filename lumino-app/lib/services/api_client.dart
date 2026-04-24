@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ApiClient {
-  static const _baseUrl = String.fromEnvironment('API_URL', defaultValue: 'http://10.0.2.2:8080');
+  static const _baseUrl = String.fromEnvironment('API_URL', defaultValue: 'https://lumino.damaleia.com');
   static const _accessTokenKey = 'access_token';
   static const _refreshTokenKey = 'refresh_token';
 
@@ -12,7 +12,9 @@ class ApiClient {
   ApiClient({FlutterSecureStorage? storage, Dio? dio})
       : _storage = storage ?? const FlutterSecureStorage(),
         _dio = dio ?? Dio(BaseOptions(baseUrl: _baseUrl)) {
-    _dio.interceptors.add(_AuthInterceptor(_storage, _dio, _baseUrl));
+    _dio.interceptors
+      ..add(_AuthInterceptor(_storage, _dio, _baseUrl))
+      ..add(_ErrorInterceptor());
   }
 
   Future<Response> get(String path, {Map<String, dynamic>? queryParameters}) =>
@@ -35,6 +37,24 @@ class ApiClient {
   Future<void> clearTokens() async {
     await _storage.delete(key: _accessTokenKey);
     await _storage.delete(key: _refreshTokenKey);
+  }
+}
+
+// Converts 4xx/5xx DioExceptions into plain Exceptions with the server's
+// error message extracted from { "error": "..." } response envelope.
+class _ErrorInterceptor extends Interceptor {
+  @override
+  void onError(DioException err, ErrorInterceptorHandler handler) {
+    final body = err.response?.data;
+    if (body is Map<String, dynamic>) {
+      final message = body['error'] as String?;
+      if (message != null && message.isNotEmpty) {
+        return handler.reject(
+          err.copyWith(message: message),
+        );
+      }
+    }
+    handler.next(err);
   }
 }
 

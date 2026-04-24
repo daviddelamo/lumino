@@ -56,9 +56,9 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: LuminoTheme.backgroundWarm,
+      backgroundColor: LuminoTheme.bg(context),
       appBar: AppBar(
-        backgroundColor: LuminoTheme.backgroundWarm,
+        backgroundColor: LuminoTheme.bg(context),
         title: const Text('New Habit'),
         elevation: 0,
       ),

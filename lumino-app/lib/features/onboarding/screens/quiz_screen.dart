@@ -5,9 +5,9 @@ import '../onboarding_provider.dart';
 import '../../../theme.dart';
 
 const _questions = [
-  ('chronotype', 'Are you a morning or night person?', ['Morning 🌅', 'Night 🌙'], ['morning', 'night']),
-  ('structure', 'Do you prefer structured or flexible routines?', ['Structured 📋', 'Flexible 🌊'], ['rigid', 'flexible']),
-  ('social', 'Do you prefer solo or social habits?', ['Solo 🧘', 'Social 👥'], ['solo', 'social']),
+  ('chronotype', 'Are you a morning or night person?', ['Morning 🌅', 'Night 🌙'], ['morning', 'night'], 'assets/images/onboarding_chronotype.png'),
+  ('structure', 'Do you prefer structured or flexible routines?', ['Structured 📋', 'Flexible 🌊'], ['rigid', 'flexible'], 'assets/images/onboarding_structure.png'),
+  ('social', 'Do you prefer solo or social habits?', ['Solo 🧘', 'Social 👥'], ['solo', 'social'], 'assets/images/onboarding_social.png'),
 ];
 
 class QuizScreen extends ConsumerStatefulWidget {
@@ -30,9 +30,9 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final (key, question, labels, values) = _questions[_currentQuestion];
+    final (key, question, labels, values, imagePath) = _questions[_currentQuestion];
     return Scaffold(
-      backgroundColor: LuminoTheme.backgroundWarm,
+      backgroundColor: LuminoTheme.bg(context),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -41,6 +41,15 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
             children: [
               const _StepIndicator(current: 3, total: 6),
               const Spacer(),
+              Center(
+                child: Image.asset(
+                  imagePath,
+                  height: 180,
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, __, ___) => const SizedBox(height: 180),
+                ),
+              ),
+              const SizedBox(height: 24),
               Text(question,
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     color: const Color(0xFF3A2A1A),
@@ -51,7 +60,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
                 padding: const EdgeInsets.only(bottom: 12),
                 child: FilledButton(
                   style: FilledButton.styleFrom(
-                    backgroundColor: LuminoTheme.backgroundWarm,
+                    backgroundColor: LuminoTheme.bg(context),
                     foregroundColor: const Color(0xFF3A2A1A),
                     side: const BorderSide(color: LuminoTheme.accentColor),
                     minimumSize: const Size(double.infinity, 56),
