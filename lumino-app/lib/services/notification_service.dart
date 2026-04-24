@@ -1,5 +1,4 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_all.dart' as tz_data;
@@ -12,8 +11,6 @@ class NotificationService {
   static Future<void> initialize() async {
     if (_initialized) return;
     tz_data.initializeTimeZones();
-    final String tzName = await FlutterTimezone.getLocalTimezone();
-    tz.setLocalLocation(tz.getLocation(tzName));
     const android = AndroidInitializationSettings('@mipmap/ic_launcher');
     await _plugin.initialize(const InitializationSettings(android: android));
     _initialized = true;
@@ -56,12 +53,14 @@ class NotificationService {
     );
   }
 
+  // DateTime.now() is in local time; we convert to UTC so matchDateTimeComponents
+  // fires at the correct local wall-clock time without needing flutter_timezone.
   static tz.TZDateTime _nextOccurrence(int hour, int minute) {
-    final now = tz.TZDateTime.now(tz.local);
-    var scheduled = tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
-    if (scheduled.isBefore(now)) {
-      scheduled = scheduled.add(const Duration(days: 1));
+    final now = DateTime.now();
+    var local = DateTime(now.year, now.month, now.day, hour, minute);
+    if (local.isBefore(now)) {
+      local = local.add(const Duration(days: 1));
     }
-    return scheduled;
+    return tz.TZDateTime.from(local, tz.UTC);
   }
 }
