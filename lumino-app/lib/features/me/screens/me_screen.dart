@@ -48,6 +48,11 @@ class MeScreen extends ConsumerWidget {
                       onChanged: (_) =>
                           ref.read(themeModeProvider.notifier).toggle(),
                     ),
+                    _SettingsTile(
+                      icon: Icons.notifications_outlined,
+                      label: 'Notifications',
+                      onTap: () => context.push('/me/notifications'),
+                    ),
                   ]),
                   _SettingsGroup(children: [
                     _SettingsTile(

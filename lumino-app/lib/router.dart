@@ -13,6 +13,7 @@ import 'features/habits/screens/habits_screen.dart';
 import 'features/habits/screens/habit_form_screen.dart';
 import 'features/habits/screens/habit_detail_screen.dart';
 import 'features/me/screens/me_screen.dart';
+import 'features/me/screens/notification_settings_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -31,6 +32,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/habits/add', builder: (c, s) => const HabitFormScreen()),
       GoRoute(path: '/habits/:id', builder: (c, s) => HabitDetailScreen(habitId: s.pathParameters['id']!)),
       GoRoute(path: '/me', builder: (c, s) => const MeScreen()),
+      GoRoute(path: '/me/notifications', builder: (c, s) => const NotificationSettingsScreen()),
     ],
   );
 });
