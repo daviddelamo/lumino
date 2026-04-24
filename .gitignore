@@ -49,3 +49,5 @@ lumino-api/.env
 # ─── Docker ──────────────────────────────────────────────────────────────────
 # Keep docker-compose files; ignore local override
 docker-compose.override.yml
+.superpowers/
+.worktrees/
