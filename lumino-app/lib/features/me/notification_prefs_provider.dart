@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/notification_service.dart';
@@ -51,8 +52,8 @@ class NotificationPrefsNotifier extends StateNotifier<NotificationPrefs> {
       } else {
         await NotificationService.cancelAll();
       }
-    } catch (_) {
-      // NotificationService requires Flutter binding; silently ignore in test environments.
+    } on Exception catch (e) {
+      debugPrint('NotificationService: $e');
     }
   }
 
@@ -64,8 +65,8 @@ class NotificationPrefsNotifier extends StateNotifier<NotificationPrefs> {
     if (state.enabled) {
       try {
         await NotificationService.scheduleDaily(hour, minute);
-      } catch (_) {
-        // NotificationService requires Flutter binding; silently ignore in test environments.
+      } on Exception catch (e) {
+        debugPrint('NotificationService: $e');
       }
     }
   }
