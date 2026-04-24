@@ -45,7 +45,7 @@ Future<void> onWidgetAction(Uri? uri) async {
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  HomeWidget.registerBackgroundCallback(onWidgetAction);
+  HomeWidget.registerInteractivityCallback(onWidgetAction);
   runApp(const ProviderScope(child: LuminoApp()));
 }
 
