@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:home_widget/home_widget.dart';
@@ -87,6 +88,16 @@ class _SyncServiceInitState extends ConsumerState<SyncServiceInit> {
     _syncService = SyncService(db, ApiClient());
     Future.microtask(() => _syncService.sync());
     HomeWidget.widgetClicked.listen(_handleWidgetClick);
+    _scheduleMidnightAlarm();
+  }
+
+  Future<void> _scheduleMidnightAlarm() async {
+    try {
+      const channel = MethodChannel('com.lumino.lumino_app/widget');
+      await channel.invokeMethod<void>('scheduleMidnightAlarm');
+    } catch (_) {
+      // Non-Android platforms or channel not available
+    }
   }
 
   void _handleWidgetClick(Uri? uri) {
