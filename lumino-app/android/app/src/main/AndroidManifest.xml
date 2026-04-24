@@ -26,6 +26,54 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <!-- Widget config activity -->
+        <activity
+            android:name=".WidgetConfigActivity"
+            android:exported="true"
+            android:theme="@style/LaunchTheme">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+
+        <!-- 2×2 small widget -->
+        <receiver
+            android:name=".LuminoSmallWidget"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/lumino_small_widget_info" />
+        </receiver>
+
+        <!-- 4×2 large widget -->
+        <receiver
+            android:name=".LuminoLargeWidget"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/lumino_large_widget_info" />
+        </receiver>
+
+        <!-- Midnight rollover receiver -->
+        <receiver
+            android:name=".MidnightUpdateReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.lumino.lumino_app.MIDNIGHT_UPDATE" />
+            </intent-filter>
+        </receiver>
+
+        <!-- home_widget background callback receiver -->
+        <receiver
+            android:name="es.antonborri.home_widget.HomeWidgetBackgroundReceiver"
+            android:exported="false" />
+
         <!-- Facebook SDK -->
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"

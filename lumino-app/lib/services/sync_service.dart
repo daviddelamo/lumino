@@ -5,14 +5,17 @@ import 'package:drift/drift.dart';
 import 'package:intl/intl.dart';
 import '../database/database.dart';
 import 'api_client.dart';
+import 'widget_update_service.dart';
 
 class SyncService {
   final AppDatabase _db;
   final ApiClient _api;
   bool _syncing = false;
   late final StreamSubscription<List<ConnectivityResult>> _connectivitySub;
+  late final WidgetUpdateService _widgetService;
 
   SyncService(this._db, this._api, {Connectivity? connectivity}) {
+    _widgetService = WidgetUpdateService(_db);
     _connectivitySub = (connectivity ?? Connectivity())
         .onConnectivityChanged
         .listen((results) {
@@ -31,6 +34,7 @@ class SyncService {
       final uid = userId ?? 'local';
       await _pushDirtyTasks();
       await _pullLatest(uid);
+      await _widgetService.refreshFromPrefs();
     } finally {
       _syncing = false;
     }
