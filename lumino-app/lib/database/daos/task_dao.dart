@@ -27,10 +27,30 @@ class TaskDao extends DatabaseAccessor<AppDatabase> with _$TaskDaoMixin {
         .get();
   }
 
+  /// Tasks for the today screen: uncompleted tasks from today or earlier,
+  /// plus tasks completed today. Tasks only disappear the day after completion.
+  Future<List<Task>> getActiveTasks(String userId, DateTime date) {
+    final dayStart = DateTime(date.year, date.month, date.day);
+    final dayEnd = dayStart.add(const Duration(days: 1));
+    return (select(tasks)
+          ..where((t) =>
+              t.userId.equals(userId) &
+              t.deletedAt.isNull() &
+              ((t.completedAt.isNull() & t.startAt.isSmallerThanValue(dayEnd)) |
+                  t.completedAt.isBetweenValues(dayStart, dayEnd)))
+          ..orderBy([(t) => OrderingTerm.asc(t.startAt)]))
+        .get();
+  }
+
   Future<void> markComplete(String taskId, DateTime completedAt) =>
       (update(tasks)..where((t) => t.id.equals(taskId))).write(
           TasksCompanion(
               completedAt: Value(completedAt), dirty: const Value(true)));
+
+  Future<void> markIncomplete(String taskId) =>
+      (update(tasks)..where((t) => t.id.equals(taskId))).write(
+          const TasksCompanion(
+              completedAt: Value(null), dirty: Value(true)));
 
   Future<void> softDelete(String taskId) =>
       (update(tasks)..where((t) => t.id.equals(taskId))).write(TasksCompanion(

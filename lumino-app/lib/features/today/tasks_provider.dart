@@ -1,8 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../database/database.dart';
+import '../../services/auth_state.dart';
 
 final dbProvider = Provider<AppDatabase>((ref) => AppDatabase());
-final currentUserIdProvider = Provider<String?>((ref) => null);
+final currentUserIdProvider = Provider<String?>((ref) => ref.watch(authProvider).userId);
 
 final tasksForDayProvider = FutureProvider.family<List<Task>, DateTime>((ref, date) async {
   final db = ref.watch(dbProvider);
@@ -21,11 +22,16 @@ class TasksNotifier extends StateNotifier<AsyncValue<List<Task>>> {
   }
 
   Future<void> _load() async {
-    state = await AsyncValue.guard(() => _db.taskDao.getTasksForDay(_userId, _date));
+    state = await AsyncValue.guard(() => _db.taskDao.getActiveTasks(_userId, _date));
   }
 
   Future<void> completeTask(String taskId) async {
     await _db.taskDao.markComplete(taskId, DateTime.now());
+    await _load();
+  }
+
+  Future<void> uncompleteTask(String taskId) async {
+    await _db.taskDao.markIncomplete(taskId);
     await _load();
   }
 
