@@ -6,10 +6,10 @@
 
 ### Phase 2 — Mood Tracker
 
-- [ ] **Mood check-in screen** - lumino-app: 5-level emoji scale daily check-in
-- [ ] **Mood tags and notes** - lumino-app: attach tags and free-text notes to mood entries
-- [ ] **Mood calendar view** - lumino-app: calendar heatmap showing daily mood
-- [ ] **Mood trend chart** - lumino-app: line/bar chart showing mood over time
+- [x] **Mood check-in screen** - lumino-app: 5-level emoji scale daily check-in
+- [x] **Mood tags and notes** - lumino-app: attach tags and free-text notes to mood entries
+- [x] **Mood calendar view** - lumino-app: calendar heatmap showing daily mood
+- [x] **Mood trend chart** - lumino-app: line/bar chart showing mood over time
 
 ### Phase 2 — Content Library
 
