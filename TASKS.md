@@ -13,12 +13,12 @@
 
 ### Phase 2 — Content Library
 
-- [ ] **Library home screen** - lumino-app: categories grid (meditations, soundscapes, affirmations)
-- [ ] **Guided meditations** - lumino-app: playback screen for guided meditation audio
-- [ ] **Soundscapes** - lumino-app: ambient audio playback (rain, forest, white noise, etc.)
-- [ ] **Affirmations** - lumino-app: daily affirmation cards / audio
-- [ ] **Background audio playback** - lumino-app: lock-screen controls via `audio_service` or similar
-- [ ] **Favorites and recently played** - lumino-app: persist and surface user's library history
+- [x] **Library home screen** - lumino-app: categories grid (meditations, soundscapes, affirmations)
+- [x] **Guided meditations** - lumino-app: playback screen for guided meditation audio
+- [x] **Soundscapes** - lumino-app: ambient audio playback (rain, forest, white noise, etc.)
+- [x] **Affirmations** - lumino-app: daily affirmation cards / audio
+- [x] **Background audio playback** - lumino-app: lock-screen controls via `audio_service` or similar
+- [x] **Favorites and recently played** - lumino-app: persist and surface user's library history
 
 ### Phase 2 — Widgets
 
