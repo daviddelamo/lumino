@@ -1,3 +1,4 @@
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,11 +10,10 @@ import 'features/me/theme_provider.dart';
 import 'features/today/tasks_provider.dart';
 import 'router.dart';
 import 'services/api_client.dart';
+import 'services/audio_handler.dart';
 import 'services/sync_service.dart';
 import 'services/widget_update_service.dart';
 import 'theme.dart';
-import 'package:audio_service/audio_service.dart';
-import 'services/audio_handler.dart';
 
 /// Called in a background isolate when a widget action fires (e.g. habit complete).
 @pragma('vm:entry-point')

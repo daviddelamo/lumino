@@ -9,16 +9,19 @@ import 'package:lumino_app/theme.dart';
 void main() {
   testWidgets('LuminoApp smoke test', (WidgetTester tester) async {
     await tester.pumpWidget(
-      ProviderScope(
+      const ProviderScope(
         child: _TestApp(),
       ),
     );
     await tester.pump();
     await tester.pump(const Duration(seconds: 5));
+    expect(tester.takeException(), isNull);
   });
 }
 
 class _TestApp extends ConsumerWidget {
+  const _TestApp({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = ref.watch(themeModeProvider);
