@@ -3,6 +3,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:drift/drift.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../database/database.dart';
 import 'api_client.dart';
 import 'widget_update_service.dart';
@@ -34,6 +35,7 @@ class SyncService {
       final uid = userId ?? 'local';
       await _pushDirtyTasks();
       await _pullLatest(uid);
+      await _syncMood(uid);
       await _widgetService.refreshFromPrefs();
     } finally {
       _syncing = false;
@@ -90,5 +92,46 @@ class SyncService {
       startAt: DateTime.parse(t['startAt'] as String),
       dirty: const Value(false),
     );
+  }
+
+  Future<void> _syncMood(String userId) async {
+    final dirty = await _db.moodDao.getDirtyEntries(userId);
+    for (final entry in dirty) {
+      try {
+        await _api.post('/api/mood', data: {
+          'moodLevel': entry.moodLevel,
+          'tags': entry.tags,
+          'note': entry.note,
+          'loggedAt': entry.loggedAt.toUtc().toIso8601String(),
+        });
+        await _db.moodDao.markSynced([entry.id]);
+      } on DioException catch (_) {}
+    }
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final since =
+          prefs.getString('lastMoodPullAt') ?? DateTime(2020).toIso8601String();
+      final res = await _api.get('/api/mood', queryParameters: {'since': since});
+      final raw = res.data;
+      if (raw is Map<String, dynamic>) {
+        final list = raw['data'];
+        if (list is List) {
+          for (final m in list) {
+            if (m is! Map<String, dynamic>) continue;
+            await _db.moodDao.insertEntry(MoodEntriesCompanion.insert(
+              userId: userId,
+              moodLevel: m['moodLevel'] as int,
+              tags: Value(m['tags'] as String? ?? '[]'),
+              note: Value(m['note'] as String?),
+              loggedAt: DateTime.parse(m['loggedAt'] as String),
+              dirty: const Value(false),
+            ));
+          }
+        }
+      }
+      await prefs.setString(
+          'lastMoodPullAt', DateTime.now().toUtc().toIso8601String());
+    } on DioException catch (_) {}
   }
 }

@@ -6,6 +6,7 @@ import 'package:lumino_app/database/database.dart';
 import 'package:lumino_app/services/api_client.dart';
 import 'package:lumino_app/services/sync_service.dart';
 import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MockApiClient extends Mock implements ApiClient {}
 
@@ -16,10 +17,12 @@ void main() {
 
   setUpAll(() {
     TestWidgetsFlutterBinding.ensureInitialized();
+    SharedPreferences.setMockInitialValues({});
     registerFallbackValue(RequestOptions(path: ''));
   });
 
   setUp(() {
+    SharedPreferences.setMockInitialValues({});
     db = AppDatabase.forTesting(NativeDatabase.memory());
     api = MockApiClient();
     svc = SyncService(db, api);
@@ -69,5 +72,34 @@ void main() {
     ));
     await svc.sync();
     verify(() => api.delete(any())).called(1);
+  });
+
+  test('sync pushes dirty mood entries to the mood API endpoint', () async {
+    await db.moodDao.insertEntry(MoodEntriesCompanion.insert(
+      userId: 'me',
+      moodLevel: 4,
+      loggedAt: DateTime(2026, 4, 24, 9, 0),
+    ));
+    when(() => api.getAccessToken()).thenAnswer((_) async => 'token');
+    when(() => api.post(any(), data: any(named: 'data')))
+        .thenAnswer((_) async => Response(
+              data: {'data': {}},
+              statusCode: 201,
+              requestOptions: RequestOptions(path: ''),
+            ));
+    when(() => api.get(any(), queryParameters: any(named: 'queryParameters')))
+        .thenAnswer((_) async => Response(
+              data: {'data': []},
+              statusCode: 200,
+              requestOptions: RequestOptions(path: ''),
+            ));
+
+    await svc.sync(userId: 'me');
+
+    // Dirty entry must now be marked synced
+    final stillDirty = await db.moodDao.getDirtyEntries('me');
+    expect(stillDirty, isEmpty);
+    // POST to /api/mood was called once
+    verify(() => api.post('/api/mood', data: any(named: 'data'))).called(1);
   });
 }
