@@ -1,4 +1,5 @@
 import 'package:audio_service/audio_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import '../features/library/library_data.dart';
 
@@ -6,7 +7,10 @@ class LuminoAudioHandler extends BaseAudioHandler with SeekHandler {
   final _player = AudioPlayer();
 
   LuminoAudioHandler() {
-    _player.playbackEventStream.map(_toPlaybackState).pipe(playbackState);
+    _player.playbackEventStream
+        .map(_toPlaybackState)
+        .pipe(playbackState)
+        .catchError((_) {});
   }
 
   Stream<Duration> get positionStream => _player.positionStream;
@@ -42,6 +46,8 @@ class LuminoAudioHandler extends BaseAudioHandler with SeekHandler {
   @override
   Future<void> onTaskRemoved() => stop();
 
+  Future<void> dispose() => _player.dispose();
+
   PlaybackState _toPlaybackState(PlaybackEvent event) {
     return PlaybackState(
       controls: [
@@ -66,3 +72,8 @@ class LuminoAudioHandler extends BaseAudioHandler with SeekHandler {
     );
   }
 }
+
+/// Overridden in main() with the result of AudioService.init().
+final audioHandlerProvider = Provider<LuminoAudioHandler>((ref) {
+  throw UnimplementedError('audioHandlerProvider must be overridden in main()');
+});
