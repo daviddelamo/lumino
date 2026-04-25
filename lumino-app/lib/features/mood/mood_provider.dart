@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:drift/drift.dart' hide Column;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../database/database.dart';
-import '../../features/today/tasks_provider.dart';
+import '../today/tasks_provider.dart';
 
 class MoodNotifier extends StateNotifier<AsyncValue<List<MoodEntry>>> {
   final AppDatabase _db;
@@ -42,6 +42,7 @@ final moodProvider =
 
 final moodEntriesForMonthProvider =
     FutureProvider.family<List<MoodEntry>, (int, int)>((ref, yearMonth) async {
+  ref.watch(moodProvider); // invalidate when today's entries change
   final db = ref.watch(dbProvider);
   final userId = ref.watch(currentUserIdProvider) ?? 'local';
   final (year, month) = yearMonth;
@@ -52,6 +53,7 @@ final moodEntriesForMonthProvider =
 
 final moodEntriesLast14Provider =
     FutureProvider<List<MoodEntry>>((ref) async {
+  ref.watch(moodProvider); // invalidate when today's entries change
   final db = ref.watch(dbProvider);
   final userId = ref.watch(currentUserIdProvider) ?? 'local';
   final now = DateTime.now();
