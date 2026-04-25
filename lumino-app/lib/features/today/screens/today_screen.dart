@@ -11,6 +11,8 @@ import '../../../shared/widgets/skeleton_card.dart';
 import '../../../shared/widgets/lumino_nav_bar.dart';
 import '../../../theme.dart';
 import '../../../database/database.dart';
+import '../../mood/mood_check_in_sheet.dart';
+import '../../mood/mood_provider.dart';
 
 class TodayScreen extends ConsumerWidget {
   const TodayScreen({super.key});
@@ -73,17 +75,21 @@ class TodayScreen extends ConsumerWidget {
   }
 }
 
-class _TodayHeader extends StatelessWidget {
+class _TodayHeader extends ConsumerWidget {
   final DateTime date;
   final AsyncValue<List<Task>> tasksAsync;
 
   const _TodayHeader({required this.date, required this.tasksAsync});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final tasks = tasksAsync.valueOrNull ?? [];
     final completed = tasks.where((t) => t.completedAt != null).length;
     final total = tasks.length;
+    final moodState = ref.watch(moodProvider);
+    final todayLevel = moodState.valueOrNull?.isNotEmpty == true
+        ? moodState.valueOrNull!.last.moodLevel
+        : null;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
@@ -109,7 +115,7 @@ class _TodayHeader extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
@@ -127,6 +133,20 @@ class _TodayHeader extends StatelessWidget {
                     style: Theme.of(context).textTheme.labelSmall,
                   ),
                 ],
+              ),
+              const SizedBox(width: 8),
+              GestureDetector(
+                onTap: () => showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: LuminoTheme.bg(context),
+                  shape: const RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(20)),
+                  ),
+                  builder: (_) => const MoodCheckInSheet(),
+                ),
+                child: _MoodButton(level: todayLevel),
               ),
             ],
           ),
@@ -149,6 +169,38 @@ class _TodayHeader extends StatelessWidget {
     if (hour < 12) return 'Good morning';
     if (hour < 17) return 'Good afternoon';
     return 'Good evening';
+  }
+}
+
+class _MoodButton extends StatelessWidget {
+  final int? level;
+  const _MoodButton({this.level});
+
+  static const _colors = [
+    Color(0xFFE05C5C),
+    Color(0xFFE8913A),
+    Color(0xFFE8C23A),
+    Color(0xFF8BC48A),
+    Color(0xFF52B788),
+  ];
+  static const _emojis = ['😢', '😕', '😐', '🙂', '😄'];
+
+  @override
+  Widget build(BuildContext context) {
+    final color = level != null
+        ? _colors[level! - 1]
+        : LuminoTheme.divider(context);
+    final emoji = level != null ? _emojis[level! - 1] : '😶';
+    return Container(
+      width: 44,
+      height: 44,
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: color.withValues(alpha: 0.5), width: 1.5),
+      ),
+      child: Center(child: Text(emoji, style: const TextStyle(fontSize: 22))),
+    );
   }
 }
 
