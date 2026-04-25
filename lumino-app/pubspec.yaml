@@ -30,6 +30,8 @@ dependencies:
   flutter_facebook_auth: ^7.1.1
   home_widget: ^0.7.0
   fl_chart: ^0.69.0
+  just_audio: ^0.9.40
+  audio_service: ^0.18.14
 
 dev_dependencies:
   flutter_test:

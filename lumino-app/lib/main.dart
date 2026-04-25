@@ -12,6 +12,8 @@ import 'services/api_client.dart';
 import 'services/sync_service.dart';
 import 'services/widget_update_service.dart';
 import 'theme.dart';
+import 'package:audio_service/audio_service.dart';
+import 'services/audio_handler.dart';
 
 /// Called in a background isolate when a widget action fires (e.g. habit complete).
 @pragma('vm:entry-point')
@@ -43,10 +45,21 @@ Future<void> onWidgetAction(Uri? uri) async {
   );
 }
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   HomeWidget.registerInteractivityCallback(onWidgetAction);
-  runApp(const ProviderScope(child: LuminoApp()));
+  final handler = await AudioService.init(
+    builder: () => LuminoAudioHandler(),
+    config: const AudioServiceConfig(
+      androidNotificationChannelId: 'com.lumino.lumino_app.audio',
+      androidNotificationChannelName: 'Lumino Audio',
+      androidNotificationOngoing: true,
+    ),
+  );
+  runApp(ProviderScope(
+    overrides: [audioHandlerProvider.overrideWithValue(handler)],
+    child: const LuminoApp(),
+  ));
 }
 
 class LuminoApp extends ConsumerWidget {
