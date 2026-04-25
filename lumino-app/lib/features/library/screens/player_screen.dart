@@ -143,8 +143,10 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                     IconButton(
                       iconSize: 36,
                       icon: const Icon(Icons.replay_10),
-                      onPressed: () => handler.seek(
-                          handler.currentPosition - const Duration(seconds: 10)),
+                      onPressed: () {
+                        final pos = handler.currentPosition - const Duration(seconds: 10);
+                        handler.seek(pos < Duration.zero ? Duration.zero : pos);
+                      },
                     ),
                     const SizedBox(width: 8),
                     GestureDetector(

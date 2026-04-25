@@ -45,6 +45,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/library', builder: (c, s) => const LibraryScreen()),
       GoRoute(
         path: '/library/category/:category',
+        redirect: (c, s) => s.pathParameters['category'] == 'affirmation'
+            ? '/library/affirmations'
+            : null,
         builder: (c, s) {
           final cat = switch (s.pathParameters['category']) {
             'soundscape' => LibraryCategory.soundscape,

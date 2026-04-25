@@ -12,16 +12,17 @@ class AffirmationsScreen extends StatefulWidget {
 
 class _AffirmationsScreenState extends State<AffirmationsScreen> {
   late final PageController _controller;
+  late final int _todayIndex;
   late int _currentPage;
 
   @override
   void initState() {
     super.initState();
-    final dayIndex =
+    _todayIndex =
         DateTime.now().difference(DateTime(2024)).inDays %
             kAffirmations.length;
-    _currentPage = dayIndex;
-    _controller = PageController(initialPage: dayIndex);
+    _currentPage = _todayIndex;
+    _controller = PageController(initialPage: _todayIndex);
   }
 
   @override
@@ -48,7 +49,7 @@ class _AffirmationsScreenState extends State<AffirmationsScreen> {
               onPageChanged: (i) => setState(() => _currentPage = i),
               itemBuilder: (_, i) => _AffirmationCard(
                 text: kAffirmations[i],
-                isToday: i == _currentPage,
+                isToday: i == _todayIndex,
               ),
             ),
           ),
