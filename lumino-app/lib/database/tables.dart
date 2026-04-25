@@ -70,6 +70,17 @@ class Users extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+class MoodEntries extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get userId => text()();
+  IntColumn get moodLevel => integer()();
+  TextColumn get tags =>
+      text().withDefault(const Constant('[]'))();
+  TextColumn get note => text().nullable()();
+  DateTimeColumn get loggedAt => dateTime()();
+  BoolColumn get dirty => boolean().withDefault(const Constant(true))();
+}
+
 String _uuid() => generateUuid();
 
 String generateUuid() {

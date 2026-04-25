@@ -39,4 +39,52 @@ void main() {
     expect(habits, hasLength(1));
     expect(habits.first.title, 'Drink water');
   });
+
+  test('can insert a mood entry and retrieve it by date range', () async {
+    final now = DateTime(2026, 4, 24, 9, 0);
+    await db.moodDao.insertEntry(MoodEntriesCompanion.insert(
+      userId: 'test-user',
+      moodLevel: 4,
+      tags: const Value('["calm","focused"]'),
+      loggedAt: now,
+    ));
+    final entries = await db.moodDao.getEntriesForDateRange(
+      'test-user',
+      DateTime(2026, 4, 24),
+      DateTime(2026, 4, 24, 23, 59, 59),
+    );
+    expect(entries, hasLength(1));
+    expect(entries.first.moodLevel, 4);
+    expect(entries.first.tags, '["calm","focused"]');
+  });
+
+  test('getDirtyEntries returns only dirty rows for user', () async {
+    await db.moodDao.insertEntry(MoodEntriesCompanion.insert(
+      userId: 'test-user',
+      moodLevel: 3,
+      loggedAt: DateTime(2026, 4, 24),
+    ));
+    await db.moodDao.insertEntry(MoodEntriesCompanion.insert(
+      userId: 'test-user',
+      moodLevel: 2,
+      loggedAt: DateTime(2026, 4, 24),
+      dirty: const Value(false),
+    ));
+    final dirty = await db.moodDao.getDirtyEntries('test-user');
+    expect(dirty, hasLength(1));
+    expect(dirty.first.moodLevel, 3);
+  });
+
+  test('markSynced sets dirty to false', () async {
+    await db.moodDao.insertEntry(MoodEntriesCompanion.insert(
+      userId: 'test-user',
+      moodLevel: 5,
+      loggedAt: DateTime(2026, 4, 24),
+    ));
+    final before = await db.moodDao.getDirtyEntries('test-user');
+    expect(before, hasLength(1));
+    await db.moodDao.markSynced([before.first.id]);
+    final after = await db.moodDao.getDirtyEntries('test-user');
+    expect(after, isEmpty);
+  });
 }
