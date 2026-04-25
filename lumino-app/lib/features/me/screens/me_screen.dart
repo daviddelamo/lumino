@@ -70,6 +70,13 @@ class MeScreen extends ConsumerWidget {
                       onTap: () => _confirmDelete(context, ref),
                     ),
                   ]),
+                  _SettingsGroup(children: [
+                    _SettingsTile(
+                      icon: Icons.mood_outlined,
+                      label: 'Mood history',
+                      onTap: () => context.push('/mood/history'),
+                    ),
+                  ]),
                   const _SettingsGroup(children: [
                     _SettingsTile(
                       icon: Icons.info_outline,

@@ -15,6 +15,7 @@ import 'features/habits/screens/habit_detail_screen.dart';
 import 'features/me/screens/me_screen.dart';
 import 'features/me/screens/notification_settings_screen.dart';
 import 'features/widget_config/widget_config_screen.dart';
+import 'features/mood/mood_history_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -35,6 +36,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/me', builder: (c, s) => const MeScreen()),
       GoRoute(path: '/me/notifications', builder: (c, s) => const NotificationSettingsScreen()),
       GoRoute(path: '/widget-config', builder: (c, s) => const WidgetConfigScreen()),
+      GoRoute(path: '/mood/history', builder: (c, s) => const MoodHistoryScreen()),
     ],
   );
 });
