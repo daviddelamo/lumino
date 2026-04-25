@@ -17,6 +17,8 @@ class LuminoNavBar extends StatelessWidget {
           case 1:
             context.go('/habits');
           case 2:
+            context.go('/library');
+          case 3:
             context.go('/me');
         }
       },
@@ -30,6 +32,11 @@ class LuminoNavBar extends StatelessWidget {
           icon: Icon(Icons.check_circle_outline),
           selectedIcon: Icon(Icons.check_circle),
           label: 'Habits',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.headphones_outlined),
+          selectedIcon: Icon(Icons.headphones),
+          label: 'Library',
         ),
         NavigationDestination(
           icon: Icon(Icons.person_outline),

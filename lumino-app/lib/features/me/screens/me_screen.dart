@@ -89,7 +89,7 @@ class MeScreen extends ConsumerWidget {
           ],
         ),
       ),
-      bottomNavigationBar: const LuminoNavBar(currentIndex: 2),
+      bottomNavigationBar: const LuminoNavBar(currentIndex: 3),
     );
   }
 

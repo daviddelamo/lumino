@@ -16,6 +16,11 @@ import 'features/me/screens/me_screen.dart';
 import 'features/me/screens/notification_settings_screen.dart';
 import 'features/widget_config/widget_config_screen.dart';
 import 'features/mood/mood_history_screen.dart';
+import 'features/library/screens/library_screen.dart';
+import 'features/library/screens/library_category_screen.dart';
+import 'features/library/screens/player_screen.dart';
+import 'features/library/screens/affirmations_screen.dart';
+import 'features/library/library_data.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -37,6 +42,25 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/me/notifications', builder: (c, s) => const NotificationSettingsScreen()),
       GoRoute(path: '/widget-config', builder: (c, s) => const WidgetConfigScreen()),
       GoRoute(path: '/mood/history', builder: (c, s) => const MoodHistoryScreen()),
+      GoRoute(path: '/library', builder: (c, s) => const LibraryScreen()),
+      GoRoute(
+        path: '/library/category/:category',
+        builder: (c, s) {
+          final cat = switch (s.pathParameters['category']) {
+            'soundscape' => LibraryCategory.soundscape,
+            _ => LibraryCategory.meditation,
+          };
+          return LibraryCategoryScreen(category: cat);
+        },
+      ),
+      GoRoute(
+        path: '/library/player',
+        builder: (c, s) => PlayerScreen(item: s.extra! as LibraryItem),
+      ),
+      GoRoute(
+        path: '/library/affirmations',
+        builder: (c, s) => const AffirmationsScreen(),
+      ),
     ],
   );
 });
