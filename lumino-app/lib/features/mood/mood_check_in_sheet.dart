@@ -41,23 +41,32 @@ class _MoodCheckInSheetState extends ConsumerState<MoodCheckInSheet> {
   Future<void> _save() async {
     if (_selectedLevel == null || _saving) return;
     setState(() => _saving = true);
-    await ref.read(moodProvider.notifier).checkIn(
-          _selectedLevel!,
-          _selectedTags.toList(),
-          note: _noteCtrl.text.trim().isEmpty ? null : _noteCtrl.text.trim(),
-        );
-    if (mounted) {
-      Navigator.of(context).pop();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Mood logged'),
-          action: SnackBarAction(
-            label: 'See history',
-            onPressed: () => GoRouter.of(context).push('/mood/history'),
+    try {
+      await ref.read(moodProvider.notifier).checkIn(
+            _selectedLevel!,
+            _selectedTags.toList(),
+            note: _noteCtrl.text.trim().isEmpty ? null : _noteCtrl.text.trim(),
+          );
+      if (mounted) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Mood logged'),
+            action: SnackBarAction(
+              label: 'See history',
+              onPressed: () => GoRouter.of(context).push('/mood/history'),
+            ),
+            duration: const Duration(seconds: 4),
           ),
-          duration: const Duration(seconds: 4),
-        ),
-      );
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _saving = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not save mood: $e')),
+        );
+      }
     }
   }
 
