@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../database/database.dart';
+import '../../services/widget_update_service.dart';
 import '../../theme.dart';
+import '../today/tasks_provider.dart';
 
-class WidgetConfigScreen extends StatefulWidget {
+class WidgetConfigScreen extends ConsumerStatefulWidget {
   const WidgetConfigScreen({super.key});
 
   @override
-  State<WidgetConfigScreen> createState() => _WidgetConfigScreenState();
+  ConsumerState<WidgetConfigScreen> createState() => _WidgetConfigScreenState();
 }
 
-class _WidgetConfigScreenState extends State<WidgetConfigScreen> {
+class _WidgetConfigScreenState extends ConsumerState<WidgetConfigScreen> {
   String _type = 'tasks';
   int _count = 5;
   String _theme = 'auto';
@@ -35,15 +39,22 @@ class _WidgetConfigScreenState extends State<WidgetConfigScreen> {
   Future<void> _save() async {
     setState(() => _saving = true);
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('lumino_widget_type',  _type);
-    await prefs.setInt('lumino_widget_count',     _count);
-    await prefs.setString('lumino_widget_theme',  _theme);
+    final userId = ref.read(currentUserIdProvider) ?? 'local';
+    await prefs.setString('lumino_widget_type',    _type);
+    await prefs.setInt('lumino_widget_count',       _count);
+    await prefs.setString('lumino_widget_theme',    _theme);
+    await prefs.setString('lumino_widget_user_id',  userId);
 
-    await HomeWidget.saveWidgetData<String>('lumino_widget_type',  _type);
-    await HomeWidget.saveWidgetData<int>('lumino_widget_count',    _count);
-    await HomeWidget.saveWidgetData<String>('lumino_widget_theme', _theme);
-    await HomeWidget.updateWidget(androidName: 'LuminoSmallWidget');
-    await HomeWidget.updateWidget(androidName: 'LuminoLargeWidget');
+    // Save type to HomeWidget storage so the Kotlin widget can read it.
+    await HomeWidget.saveWidgetData<String>('lumino_widget_type', _type);
+
+    // Fetch and save the actual items, then trigger the widget redraw.
+    final db = ref.read(dbProvider);
+    await WidgetUpdateService(db).refresh(
+      type: _type,
+      count: _count,
+      userId: userId,
+    );
 
     if (mounted) SystemNavigator.pop();
   }

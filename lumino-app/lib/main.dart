@@ -89,6 +89,14 @@ class _SyncServiceInitState extends ConsumerState<SyncServiceInit> {
     Future.microtask(() => _syncService.sync());
     HomeWidget.widgetClicked.listen(_handleWidgetClick);
     _scheduleMidnightAlarm();
+    _persistWidgetUserId(ref.read(currentUserIdProvider));
+    ref.listenManual(currentUserIdProvider, (_, userId) => _persistWidgetUserId(userId));
+  }
+
+  void _persistWidgetUserId(String? userId) {
+    SharedPreferences.getInstance().then(
+      (prefs) => prefs.setString('lumino_widget_user_id', userId ?? 'local'),
+    );
   }
 
   Future<void> _scheduleMidnightAlarm() async {
