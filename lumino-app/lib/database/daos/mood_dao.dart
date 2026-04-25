@@ -23,6 +23,7 @@ class MoodDao extends DatabaseAccessor<AppDatabase> with _$MoodDaoMixin {
             ..orderBy([(e) => OrderingTerm.asc(e.loggedAt)]))
           .get();
 
+  // Filters by userId unlike TaskDao.getDirtyTasks — mood sync is user-scoped at the service layer.
   Future<List<MoodEntry>> getDirtyEntries(String userId) =>
       (select(moodEntries)
             ..where((e) => e.userId.equals(userId) & e.dirty.equals(true)))
