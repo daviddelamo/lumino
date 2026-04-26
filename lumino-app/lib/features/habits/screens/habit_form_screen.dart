@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../habits_provider.dart';
 import '../../../theme.dart';
+import '../../paywall/paywall_gate.dart';
+import '../../paywall/paywall_provider.dart';
 
 class HabitFormScreen extends ConsumerStatefulWidget {
   const HabitFormScreen({super.key});
@@ -19,7 +21,6 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
   final String _iconId = 'circle';
   String _frequencyRule = '{"type":"daily"}';
   bool _saving = false;
-  String? _error;
 
   @override
   void dispose() {
@@ -31,26 +32,24 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
     if (_titleCtrl.text.trim().isEmpty) return;
     setState(() {
       _saving = true;
-      _error = null;
     });
-    try {
-      await ref.read(habitsNotifierProvider.notifier).addHabit(
-            title: _titleCtrl.text.trim(),
-            iconId: _iconId,
-            color: _color,
-            type: _type,
-            targetValue: _target,
-            frequencyRule: _frequencyRule,
-          );
-      if (mounted) { context.pop(); }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _error = e.toString();
-          _saving = false;
-        });
-      }
+    final isPremium = ref.read(isPremiumProvider);
+    final added = await ref.read(habitsNotifierProvider.notifier).addHabit(
+          isPremium: isPremium,
+          title: _titleCtrl.text.trim(),
+          iconId: _iconId,
+          color: _color,
+          type: _type,
+          targetValue: _target,
+          frequencyRule: _frequencyRule,
+        );
+    if (!mounted) return;
+    if (!added) {
+      setState(() => _saving = false);
+      await paywallGate(context, ref);
+      return;
     }
+    context.pop();
   }
 
   @override
@@ -107,10 +106,6 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
               ],
               onChanged: (v) => setState(() => _frequencyRule = v!),
             ),
-            if (_error != null) ...[
-              const SizedBox(height: 12),
-              Text(_error!, style: const TextStyle(color: Colors.red)),
-            ],
             const SizedBox(height: 32),
             SizedBox(
               width: double.infinity,
