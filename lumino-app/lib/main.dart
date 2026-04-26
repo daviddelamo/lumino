@@ -4,8 +4,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:home_widget/home_widget.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'database/database.dart';
+import 'features/paywall/paywall_config.dart';
 import 'features/me/theme_provider.dart';
 import 'features/today/tasks_provider.dart';
 import 'router.dart';
@@ -48,6 +50,7 @@ Future<void> onWidgetAction(Uri? uri) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   HomeWidget.registerInteractivityCallback(onWidgetAction);
+  await Purchases.configure(PurchasesConfiguration(kRcApiKey));
   final handler = await AudioService.init(
     builder: () => LuminoAudioHandler(),
     config: const AudioServiceConfig(
