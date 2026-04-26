@@ -11,6 +11,7 @@ class LibraryItem {
   final Duration duration;
   final String emoji;
   final Color color;
+  final bool isPremium;
 
   const LibraryItem({
     required this.id,
@@ -21,6 +22,7 @@ class LibraryItem {
     required this.duration,
     required this.emoji,
     required this.color,
+    this.isPremium = false,
   });
 }
 
@@ -54,6 +56,7 @@ const kLibraryCatalog = <LibraryItem>[
     duration: Duration(minutes: 10),
     emoji: '🧘',
     color: _meditationColor,
+    isPremium: true,
   ),
   LibraryItem(
     id: 'med_breath_focus',
@@ -64,6 +67,7 @@ const kLibraryCatalog = <LibraryItem>[
     duration: Duration(minutes: 3),
     emoji: '💨',
     color: _meditationColor,
+    isPremium: true,
   ),
   LibraryItem(
     id: 'snd_gentle_rain',
@@ -84,6 +88,7 @@ const kLibraryCatalog = <LibraryItem>[
     duration: Duration(minutes: 60),
     emoji: '🌲',
     color: _soundscapeColor,
+    isPremium: true,
   ),
   LibraryItem(
     id: 'snd_ocean_waves',
@@ -94,6 +99,7 @@ const kLibraryCatalog = <LibraryItem>[
     duration: Duration(minutes: 60),
     emoji: '🌊',
     color: _soundscapeColor,
+    isPremium: true,
   ),
   LibraryItem(
     id: 'snd_white_noise',
@@ -104,6 +110,7 @@ const kLibraryCatalog = <LibraryItem>[
     duration: Duration(minutes: 60),
     emoji: '〰️',
     color: _soundscapeColor,
+    isPremium: true,
   ),
 ];
 

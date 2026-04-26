@@ -36,4 +36,18 @@ void main() {
       expect(a, isNotEmpty);
     }
   });
+
+  test('each non-affirmation category has at least one free item', () {
+    for (final cat in LibraryCategory.values) {
+      if (cat == LibraryCategory.affirmation) continue;
+      final items = kLibraryCatalog.where((i) => i.category == cat);
+      final freeItems = items.where((i) => !i.isPremium);
+      expect(freeItems, isNotEmpty,
+          reason: '$cat should have at least one free item');
+    }
+  });
+
+  test('some catalog items are marked premium', () {
+    expect(kLibraryCatalog.any((i) => i.isPremium), isTrue);
+  });
 }
