@@ -27,4 +27,66 @@ void main() {
     expect(habits, hasLength(1));
     await db.close();
   });
+
+  test('addHabit returns false when at 5 habits and not premium', () async {
+    final db = AppDatabase.forTesting(NativeDatabase.memory());
+    for (var i = 1; i <= 5; i++) {
+      await db.habitDao.insertHabit(HabitsCompanion.insert(
+        userId: 'u1',
+        title: 'Habit $i',
+        type: 'bool',
+        frequencyRule: '{"type":"daily"}',
+      ));
+    }
+    final container = ProviderContainer(overrides: [
+      dbProvider.overrideWithValue(db),
+      currentUserIdProvider.overrideWithValue('u1'),
+    ]);
+    addTearDown(container.dispose);
+    while (container.read(habitsNotifierProvider) is AsyncLoading) {
+      await Future.delayed(const Duration(milliseconds: 10));
+    }
+    final added = await container.read(habitsNotifierProvider.notifier).addHabit(
+          isPremium: false,
+          title: 'Sixth',
+          iconId: 'circle',
+          color: '#E8823A',
+          type: 'bool',
+          targetValue: 1,
+          frequencyRule: '{"type":"daily"}',
+        );
+    expect(added, isFalse);
+    await db.close();
+  });
+
+  test('addHabit returns true when at 5 habits and is premium', () async {
+    final db = AppDatabase.forTesting(NativeDatabase.memory());
+    for (var i = 1; i <= 5; i++) {
+      await db.habitDao.insertHabit(HabitsCompanion.insert(
+        userId: 'u1',
+        title: 'Habit $i',
+        type: 'bool',
+        frequencyRule: '{"type":"daily"}',
+      ));
+    }
+    final container = ProviderContainer(overrides: [
+      dbProvider.overrideWithValue(db),
+      currentUserIdProvider.overrideWithValue('u1'),
+    ]);
+    addTearDown(container.dispose);
+    while (container.read(habitsNotifierProvider) is AsyncLoading) {
+      await Future.delayed(const Duration(milliseconds: 10));
+    }
+    final added = await container.read(habitsNotifierProvider.notifier).addHabit(
+          isPremium: true,
+          title: 'Sixth',
+          iconId: 'circle',
+          color: '#E8823A',
+          type: 'bool',
+          targetValue: 1,
+          frequencyRule: '{"type":"daily"}',
+        );
+    expect(added, isTrue);
+    await db.close();
+  });
 }

@@ -48,7 +48,8 @@ class HabitsNotifier extends StateNotifier<AsyncValue<List<HabitWithStatus>>> {
     });
   }
 
-  Future<void> addHabit({
+  Future<bool> addHabit({
+    required bool isPremium,
     required String title,
     required String iconId,
     required String color,
@@ -57,8 +58,8 @@ class HabitsNotifier extends StateNotifier<AsyncValue<List<HabitWithStatus>>> {
     String? unit,
     required String frequencyRule,
   }) async {
-    if (state.value != null && state.value!.length >= 5) {
-      throw Exception('Free tier allows up to 5 habits');
+    if (!isPremium && state.value != null && state.value!.length >= 5) {
+      return false;
     }
     await _db.habitDao.insertHabit(HabitsCompanion.insert(
       userId: _userId,
@@ -72,6 +73,7 @@ class HabitsNotifier extends StateNotifier<AsyncValue<List<HabitWithStatus>>> {
     ));
     await _load();
     await _widgetService.refreshFromPrefs();
+    return true;
   }
 
   Future<void> completeToday(String habitId, double value) async {
