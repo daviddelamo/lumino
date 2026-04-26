@@ -72,6 +72,11 @@ class MeScreen extends ConsumerWidget {
                   ]),
                   _SettingsGroup(children: [
                     _SettingsTile(
+                      icon: Icons.bar_chart_outlined,
+                      label: 'Statistics',
+                      onTap: () => context.push('/stats'),
+                    ),
+                    _SettingsTile(
                       icon: Icons.mood_outlined,
                       label: 'Mood history',
                       onTap: () => context.push('/mood/history'),

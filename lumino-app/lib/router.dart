@@ -21,6 +21,9 @@ import 'features/library/screens/library_category_screen.dart';
 import 'features/library/screens/player_screen.dart';
 import 'features/library/screens/affirmations_screen.dart';
 import 'features/library/library_data.dart';
+import 'features/stats/stats_screen.dart';
+import 'features/stats/share_card_screen.dart';
+import 'features/stats/stats_provider.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -42,6 +45,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/me/notifications', builder: (c, s) => const NotificationSettingsScreen()),
       GoRoute(path: '/widget-config', builder: (c, s) => const WidgetConfigScreen()),
       GoRoute(path: '/mood/history', builder: (c, s) => const MoodHistoryScreen()),
+      GoRoute(path: '/stats', builder: (c, s) => const StatsScreen()),
+      GoRoute(
+        path: '/stats/share',
+        builder: (c, s) =>
+            ShareCardScreen(period: s.extra! as StatsPeriod),
+      ),
       GoRoute(path: '/library', builder: (c, s) => const LibraryScreen()),
       GoRoute(
         path: '/library/category/:category',
