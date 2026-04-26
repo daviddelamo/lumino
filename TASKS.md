@@ -27,9 +27,9 @@
 
 ### Phase 2 — Statistics
 
-- [ ] **Monthly / yearly wrapped summary** - lumino-app: end-of-period stats recap screen
-- [ ] **Habit-mood correlation view** - lumino-app: chart correlating habit streaks with mood scores
-- [ ] **Shareable progress graphics** - lumino-app: generate and share a progress image card
+- [x] **Monthly / yearly wrapped summary** - lumino-app: end-of-period stats recap screen
+- [x] **Habit-mood correlation view** - lumino-app: chart correlating habit streaks with mood scores
+- [x] **Shareable progress graphics** - lumino-app: generate and share a progress image card
 
 ## Waiting On
 
