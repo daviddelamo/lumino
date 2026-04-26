@@ -27,3 +27,6 @@ google:
 facebook:
   app-id: ${FACEBOOK_APP_ID:}
   app-secret: ${FACEBOOK_APP_SECRET:}
+
+revenuecat:
+  webhook-secret: ${REVENUECAT_WEBHOOK_SECRET:}

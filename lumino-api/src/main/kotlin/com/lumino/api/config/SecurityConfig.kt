@@ -37,6 +37,7 @@ class SecurityConfig(private val jwtAuthFilter: JwtAuthFilter) {
                     "/*.ico"
                 ).permitAll()
                 it.requestMatchers("/api/auth/**").permitAll()
+                it.requestMatchers("/api/webhooks/revenuecat").permitAll()
                 it.anyRequest().authenticated()
             }
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
