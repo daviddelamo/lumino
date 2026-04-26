@@ -31,13 +31,13 @@ class TaskDao extends DatabaseAccessor<AppDatabase> with _$TaskDaoMixin {
       String userId, DateTime from, DateTime to) {
     final fromDay = DateTime(from.year, from.month, from.day);
     final toDay =
-        DateTime(to.year, to.month, to.day, 23, 59, 59, 999);
+        DateTime(to.year, to.month, to.day).add(const Duration(days: 1));
     return (select(tasks)
           ..where((t) =>
               t.userId.equals(userId) &
               t.deletedAt.isNull() &
               t.startAt.isBiggerOrEqualValue(fromDay) &
-              t.startAt.isSmallerOrEqualValue(toDay))
+              t.startAt.isSmallerThanValue(toDay))
           ..orderBy([(t) => OrderingTerm.asc(t.startAt)]))
         .get();
   }

@@ -11,7 +11,7 @@ void main() {
     db = AppDatabase.forTesting(NativeDatabase.memory());
   });
 
-  tearDown(() => db.close());
+  tearDown(() async => db.close());
 
   test('getTasksForDateRange returns only tasks whose startAt falls in range',
       () async {
@@ -47,6 +47,39 @@ void main() {
 
     final result = await db.taskDao.getTasksForDateRange(
         'u1', DateTime(2024, 6, 10), DateTime(2024, 6, 20));
+    expect(result, isEmpty);
+  });
+
+  test('getTasksForDateRange includes tasks on the start day', () async {
+    await db.taskDao.insertTask(TasksCompanion(
+      userId: const Value('u1'),
+      title: const Value('Start day'),
+      startAt: Value(DateTime(2024, 6, 10)),
+    ));
+    final result = await db.taskDao
+        .getTasksForDateRange('u1', DateTime(2024, 6, 10), DateTime(2024, 6, 20));
+    expect(result.length, 1);
+  });
+
+  test('getTasksForDateRange includes tasks on the end day', () async {
+    await db.taskDao.insertTask(TasksCompanion(
+      userId: const Value('u1'),
+      title: const Value('End day'),
+      startAt: Value(DateTime(2024, 6, 20, 23, 30)),
+    ));
+    final result = await db.taskDao
+        .getTasksForDateRange('u1', DateTime(2024, 6, 10), DateTime(2024, 6, 20));
+    expect(result.length, 1);
+  });
+
+  test('getTasksForDateRange excludes tasks from other users', () async {
+    await db.taskDao.insertTask(TasksCompanion(
+      userId: const Value('other'),
+      title: const Value('Other user'),
+      startAt: Value(DateTime(2024, 6, 15)),
+    ));
+    final result = await db.taskDao
+        .getTasksForDateRange('u1', DateTime(2024, 6, 10), DateTime(2024, 6, 20));
     expect(result, isEmpty);
   });
 }
