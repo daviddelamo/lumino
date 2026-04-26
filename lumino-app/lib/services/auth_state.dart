@@ -1,13 +1,24 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'api_client.dart';
 
 class AuthState {
   final String? userId;
   final String? email;
   final String? displayName;
+  final bool isPremium;
 
-  const AuthState({this.userId, this.email, this.displayName});
-  const AuthState.anonymous() : userId = null, email = null, displayName = null;
+  const AuthState({
+    this.userId,
+    this.email,
+    this.displayName,
+    this.isPremium = false,
+  });
+  const AuthState.anonymous()
+      : userId = null,
+        email = null,
+        displayName = null,
+        isPremium = false;
 
   bool get isLoggedIn => userId != null;
 }
@@ -34,25 +45,32 @@ class AuthNotifier extends StateNotifier<AuthState> {
         userId: data['id'] as String?,
         email: data['email'] as String?,
         displayName: data['displayName'] as String?,
+        isPremium: (data['isPremium'] as bool?) ?? false,
       );
+      final uid = state.userId;
+      if (uid != null) {
+        await Purchases.logIn(uid);
+      }
     } catch (_) {
-      // Token expired or network error — stay anonymous
       await _client.clearTokens();
       state = const AuthState.anonymous();
     }
   }
 
-  // Call this right after a successful login/register
   Future<void> onSignedIn() => _fetchProfile();
 
   Future<void> signOut() async {
     final refreshToken = await _client.getRefreshToken();
     if (refreshToken != null) {
       try {
-        await _client.post('/api/auth/logout', data: {'refreshToken': refreshToken});
+        await _client.post('/api/auth/logout',
+            data: {'refreshToken': refreshToken});
       } catch (_) {}
     }
     await _client.clearTokens();
+    try {
+      await Purchases.logOut();
+    } catch (_) {}
     state = const AuthState.anonymous();
   }
 }
