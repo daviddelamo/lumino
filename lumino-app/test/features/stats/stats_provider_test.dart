@@ -93,4 +93,45 @@ void main() {
       expect(points.every((p) => p.mood == 0.0), isTrue);
     });
   });
+
+  group('habitBreakdownProvider', () {
+    test('returns empty list when no habits', () async {
+      final items =
+          await container.read(habitBreakdownProvider(period).future);
+      expect(items, isEmpty);
+    });
+  });
+
+  group('dailyStatsProvider with data', () {
+    test('includes mood on days with entries', () async {
+      await db.moodDao.insertEntry(MoodEntriesCompanion(
+        userId: const Value('u1'),
+        moodLevel: const Value(4),
+        loggedAt: Value(DateTime(2024, 6, 15)),
+      ));
+      final points =
+          await container.read(dailyStatsProvider(period).future);
+      final june15 = points.firstWhere(
+          (p) => p.date == DateTime(2024, 6, 15));
+      expect(june15.mood, 4.0);
+    });
+
+    test('averages multiple mood entries on same day', () async {
+      await db.moodDao.insertEntry(MoodEntriesCompanion(
+        userId: const Value('u1'),
+        moodLevel: const Value(2),
+        loggedAt: Value(DateTime(2024, 6, 10, 9)),
+      ));
+      await db.moodDao.insertEntry(MoodEntriesCompanion(
+        userId: const Value('u1'),
+        moodLevel: const Value(4),
+        loggedAt: Value(DateTime(2024, 6, 10, 20)),
+      ));
+      final points =
+          await container.read(dailyStatsProvider(period).future);
+      final june10 = points.firstWhere(
+          (p) => p.date == DateTime(2024, 6, 10));
+      expect(june10.mood, 3.0);
+    });
+  });
 }

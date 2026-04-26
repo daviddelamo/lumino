@@ -11,7 +11,7 @@ class StatsData {
   final double habitCompletionRate;
   final double avgMood;
   final int bestStreak;
-  final String bestStreakHabit;
+  final String? bestStreakHabit;
 
   const StatsData({
     required this.tasksCompleted,
@@ -19,7 +19,7 @@ class StatsData {
     required this.habitCompletionRate,
     required this.avgMood,
     required this.bestStreak,
-    required this.bestStreakHabit,
+    this.bestStreakHabit,
   });
 }
 
@@ -36,15 +36,17 @@ final statsProvider =
     FutureProvider.family<StatsData, StatsPeriod>((ref, period) async {
   final db = ref.watch(dbProvider);
   final userId = ref.watch(currentUserIdProvider) ?? 'local';
+  final from = DateTime(period.from.year, period.from.month, period.from.day);
+  final to = DateTime(period.to.year, period.to.month, period.to.day);
 
   final tasks =
-      await db.taskDao.getTasksForDateRange(userId, period.from, period.to);
+      await db.taskDao.getTasksForDateRange(userId, from, to);
   final tasksCompleted = tasks.where((t) => t.completedAt != null).length;
 
   final habits = await db.habitDao.getActiveHabits(userId);
   double habitRate = 0;
   int bestStreak = 0;
-  String bestStreakHabit = '';
+  String? bestStreakHabit;
 
   if (habits.isNotEmpty) {
     int totalExpected = 0;
@@ -52,8 +54,8 @@ final statsProvider =
 
     for (final habit in habits) {
       final entries =
-          await db.habitDao.getEntries(habit.id, period.from, period.to);
-      final days = period.to.difference(period.from).inDays + 1;
+          await db.habitDao.getEntries(habit.id, from, to);
+      final days = to.difference(from).inDays + 1;
       totalExpected += days;
       totalCompleted += entries.length;
 
@@ -71,7 +73,7 @@ final statsProvider =
   }
 
   final moodEntries =
-      await db.moodDao.getEntriesForDateRange(userId, period.from, period.to);
+      await db.moodDao.getEntriesForDateRange(userId, from, to);
   final avgMood = moodEntries.isEmpty
       ? 0.0
       : moodEntries.map((e) => e.moodLevel).reduce((a, b) => a + b) /
@@ -91,10 +93,12 @@ final dailyStatsProvider =
     FutureProvider.family<List<DailyPoint>, StatsPeriod>((ref, period) async {
   final db = ref.watch(dbProvider);
   final userId = ref.watch(currentUserIdProvider) ?? 'local';
+  final from = DateTime(period.from.year, period.from.month, period.from.day);
+  final to = DateTime(period.to.year, period.to.month, period.to.day);
 
   final habits = await db.habitDao.getActiveHabits(userId);
   final moodEntries =
-      await db.moodDao.getEntriesForDateRange(userId, period.from, period.to);
+      await db.moodDao.getEntriesForDateRange(userId, from, to);
 
   final moodByDay = <DateTime, List<int>>{};
   for (final e in moodEntries) {
@@ -106,7 +110,7 @@ final dailyStatsProvider =
   final habitsByDay = <DateTime, int>{};
   for (final habit in habits) {
     final entries =
-        await db.habitDao.getEntries(habit.id, period.from, period.to);
+        await db.habitDao.getEntries(habit.id, from, to);
     for (final e in entries) {
       final day = DateTime(
           e.entryDate.year, e.entryDate.month, e.entryDate.day);
@@ -114,9 +118,9 @@ final dailyStatsProvider =
     }
   }
 
-  final days = period.to.difference(period.from).inDays + 1;
+  final days = to.difference(from).inDays + 1;
   return List.generate(days, (i) {
-    final day = period.from.add(Duration(days: i));
+    final day = from.add(Duration(days: i));
     final norm = DateTime(day.year, day.month, day.day);
 
     final completedCount = habitsByDay[norm] ?? 0;
@@ -137,16 +141,18 @@ final habitBreakdownProvider =
         (ref, period) async {
   final db = ref.watch(dbProvider);
   final userId = ref.watch(currentUserIdProvider) ?? 'local';
+  final from = DateTime(period.from.year, period.from.month, period.from.day);
+  final to = DateTime(period.to.year, period.to.month, period.to.day);
   final habits = await db.habitDao.getActiveHabits(userId);
   if (habits.isEmpty) return [];
 
-  final days = period.to.difference(period.from).inDays + 1;
+  final days = to.difference(from).inDays + 1;
   if (days <= 0) return [];
 
   final result = <(String, double)>[];
   for (final h in habits) {
     final entries =
-        await db.habitDao.getEntries(h.id, period.from, period.to);
+        await db.habitDao.getEntries(h.id, from, to);
     result.add((h.title, (entries.length / days).clamp(0.0, 1.0)));
   }
   result.sort((a, b) => b.$2.compareTo(a.$2));
