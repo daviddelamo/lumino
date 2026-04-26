@@ -27,6 +27,21 @@ class TaskDao extends DatabaseAccessor<AppDatabase> with _$TaskDaoMixin {
         .get();
   }
 
+  Future<List<Task>> getTasksForDateRange(
+      String userId, DateTime from, DateTime to) {
+    final fromDay = DateTime(from.year, from.month, from.day);
+    final toDay =
+        DateTime(to.year, to.month, to.day, 23, 59, 59, 999);
+    return (select(tasks)
+          ..where((t) =>
+              t.userId.equals(userId) &
+              t.deletedAt.isNull() &
+              t.startAt.isBiggerOrEqualValue(fromDay) &
+              t.startAt.isSmallerOrEqualValue(toDay))
+          ..orderBy([(t) => OrderingTerm.asc(t.startAt)]))
+        .get();
+  }
+
   /// Tasks for the today screen: uncompleted tasks from today or earlier,
   /// plus tasks completed today. Tasks only disappear the day after completion.
   Future<List<Task>> getActiveTasks(String userId, DateTime date) {
