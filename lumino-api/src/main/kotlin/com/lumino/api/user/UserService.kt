@@ -1,6 +1,7 @@
 package com.lumino.api.user
 
 import com.lumino.api.auth.RefreshTokenRepository
+import com.lumino.api.subscription.SubscriptionService
 import com.lumino.api.user.dto.UpdateProfileRequest
 import com.lumino.api.user.dto.UserResponse
 import org.springframework.stereotype.Service
@@ -10,11 +11,13 @@ import java.time.Instant
 @Service
 class UserService(
     private val userRepository: UserRepository,
-    private val refreshTokenRepository: RefreshTokenRepository
+    private val refreshTokenRepository: RefreshTokenRepository,
+    private val subscriptionService: SubscriptionService
 ) {
 
     @Transactional(readOnly = true)
-    fun getProfile(user: User): UserResponse = UserResponse.from(user)
+    fun getProfile(user: User): UserResponse =
+        UserResponse.from(user, subscriptionService.isPremium(user.id))
 
     @Transactional
     fun updateProfile(user: User, request: UpdateProfileRequest): UserResponse {
@@ -26,7 +29,10 @@ class UserService(
         request.locale?.let { userRepository.updateLocale(user.id, it) }
         request.timezone?.let { userRepository.updateTimezone(user.id, it) }
         request.onboardingProfile?.let { userRepository.updateOnboardingProfile(user.id, it) }
-        return UserResponse.from(userRepository.findById(user.id).orElseThrow())
+        return UserResponse.from(
+            userRepository.findById(user.id).orElseThrow(),
+            subscriptionService.isPremium(user.id)
+        )
     }
 
     @Transactional

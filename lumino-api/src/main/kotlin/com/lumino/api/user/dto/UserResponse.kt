@@ -11,9 +11,13 @@ data class UserResponse(
     val locale: String,
     val timezone: String,
     val onboardingProfile: String?,
-    val createdAt: Instant
+    val createdAt: Instant,
+    val isPremium: Boolean
 ) {
     companion object {
-        fun from(u: User) = UserResponse(u.id, u.email, u.displayName, u.locale, u.timezone, u.onboardingProfile, u.createdAt)
+        fun from(u: User, isPremium: Boolean) = UserResponse(
+            u.id, u.email, u.displayName, u.locale, u.timezone,
+            u.onboardingProfile, u.createdAt, isPremium
+        )
     }
 }
