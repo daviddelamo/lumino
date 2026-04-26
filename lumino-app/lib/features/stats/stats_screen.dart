@@ -88,13 +88,19 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
             loading: () => const SizedBox(
                 height: 160,
                 child: Center(child: CircularProgressIndicator())),
-            error: (_, __) => const SizedBox.shrink(),
+            error: (e, st) {
+              debugPrint('dailyStatsProvider error: $e\n$st');
+              return const SizedBox.shrink();
+            },
             data: (points) => _CorrelationChart(points: points),
           ),
           const SizedBox(height: 28),
           breakdownAsync.when(
             loading: () => const SizedBox.shrink(),
-            error: (_, __) => const SizedBox.shrink(),
+            error: (e, st) {
+              debugPrint('habitBreakdownProvider error: $e\n$st');
+              return const SizedBox.shrink();
+            },
             data: (items) => items.isEmpty
                 ? const SizedBox.shrink()
                 : _HabitBreakdown(items: items),
@@ -295,9 +301,7 @@ class _CorrelationChart extends StatelessWidget {
       }
     }
 
-    double xInterval = 1;
-    if (points.length > 31) xInterval = 30;
-    else if (points.length > 7) xInterval = 7;
+    final xInterval = points.length > 31 ? 30.0 : points.length > 7 ? 7.0 : 1.0;
 
     return SizedBox(
       height: 160,
