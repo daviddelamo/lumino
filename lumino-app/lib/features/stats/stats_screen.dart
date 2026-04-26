@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../theme.dart';
+import '../paywall/paywall_gate.dart';
+import '../paywall/paywall_provider.dart';
 import 'stats_provider.dart';
 
 enum _Period { week, month, year }
@@ -38,6 +40,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isPremium = ref.watch(isPremiumProvider);
     final period = _selected.period;
     final statsAsync = ref.watch(statsProvider(period));
     final dailyAsync = ref.watch(dailyStatsProvider(period));
@@ -61,7 +64,14 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
         children: [
           _PeriodChips(
             selected: _selected,
-            onChanged: (p) => setState(() => _selected = p),
+            locked: isPremium ? {} : {_Period.year},
+            onChanged: (p) {
+              if (p == _Period.year && !isPremium) {
+                paywallGate(context, ref);
+                return;
+              }
+              setState(() => _selected = p);
+            },
           ),
           const SizedBox(height: 20),
           statsAsync.when(
@@ -114,14 +124,20 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
 class _PeriodChips extends StatelessWidget {
   final _Period selected;
   final ValueChanged<_Period> onChanged;
+  final Set<_Period> locked;
 
-  const _PeriodChips({required this.selected, required this.onChanged});
+  const _PeriodChips({
+    required this.selected,
+    required this.onChanged,
+    this.locked = const {},
+  });
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: _Period.values.map((opt) {
         final isSelected = opt == selected;
+        final isLocked = locked.contains(opt);
         return Padding(
           padding: const EdgeInsets.only(right: 8),
           child: GestureDetector(
@@ -135,15 +151,31 @@ class _PeriodChips extends StatelessWidget {
                     : LuminoTheme.surface(context),
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: Text(
-                opt.label,
-                style: TextStyle(
-                  color: isSelected
-                      ? Colors.white
-                      : LuminoTheme.textPrimary(context),
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13,
-                ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    opt.label,
+                    style: TextStyle(
+                      color: isSelected
+                          ? Colors.white
+                          : LuminoTheme.textPrimary(context),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
+                  ),
+                  if (isLocked) ...[
+                    const SizedBox(width: 4),
+                    Icon(
+                      Icons.lock,
+                      size: 12,
+                      color: isSelected
+                          ? Colors.white70
+                          : LuminoTheme.textPrimary(context)
+                              .withValues(alpha: 0.5),
+                    ),
+                  ],
+                ],
               ),
             ),
           ),
