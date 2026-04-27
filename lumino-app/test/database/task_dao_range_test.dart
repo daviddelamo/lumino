@@ -4,10 +4,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lumino_app/database/database.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   late AppDatabase db;
 
   setUp(() {
-    TestWidgetsFlutterBinding.ensureInitialized();
     db = AppDatabase.forTesting(NativeDatabase.memory());
   });
 

@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../database/database.dart';
 import '../../services/widget_update_service.dart';
 import '../../theme.dart';
 import '../today/tasks_provider.dart';

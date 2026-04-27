@@ -2,6 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lumino_app/features/library/library_data.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   test('catalog has at least 3 meditations', () {
     final items = kLibraryCatalog
         .where((i) => i.category == LibraryCategory.meditation)

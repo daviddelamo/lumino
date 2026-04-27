@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../database/database.dart';
 import '../habits/habits_provider.dart' show longestStreak;
 import '../today/tasks_provider.dart';
 

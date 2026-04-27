@@ -20,7 +20,7 @@ void main() {
 }
 
 class _TestApp extends ConsumerWidget {
-  const _TestApp({super.key});
+  const _TestApp();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

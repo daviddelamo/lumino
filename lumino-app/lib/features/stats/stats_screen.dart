@@ -86,11 +86,11 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
           Text('Habit & Mood Trend',
               style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 4),
-          Row(
+          const Row(
             children: [
               _LegendDot(color: LuminoTheme.primaryColor, label: 'Habits'),
-              const SizedBox(width: 16),
-              const _LegendDot(color: Color(0xFFFFB74D), label: 'Mood'),
+              SizedBox(width: 16),
+              _LegendDot(color: Color(0xFFFFB74D), label: 'Mood'),
             ],
           ),
           const SizedBox(height: 12),
@@ -454,7 +454,7 @@ class _HabitBreakdown extends StatelessWidget {
                       value: item.$2,
                       minHeight: 6,
                       backgroundColor: LuminoTheme.surface(context),
-                      valueColor: AlwaysStoppedAnimation<Color>(
+                      valueColor: const AlwaysStoppedAnimation<Color>(
                           LuminoTheme.primaryColor),
                     ),
                   ),
