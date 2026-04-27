@@ -49,7 +49,7 @@ class SubscriptionService(
             }
             "RENEWAL" -> {
                 val existing = subscriptionRepository
-                    .findByUserIdAndProductId(userId, productId)
+                    .findActiveByUserIdAndProductId(userId, productId)
                     .firstOrNull()
                 if (existing != null) {
                     existing.status = "ACTIVE"

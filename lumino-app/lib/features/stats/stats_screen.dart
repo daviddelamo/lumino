@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -67,7 +68,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
             locked: isPremium ? {} : {_Period.year},
             onChanged: (p) {
               if (p == _Period.year && !isPremium) {
-                paywallGate(context, ref);
+                unawaited(paywallGate(context, ref));
                 return;
               }
               setState(() => _selected = p);

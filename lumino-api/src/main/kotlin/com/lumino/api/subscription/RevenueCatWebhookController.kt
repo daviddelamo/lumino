@@ -28,7 +28,7 @@ class RevenueCatWebhookController(
         @RequestHeader("Authorization") auth: String?,
         @RequestBody payload: RcWebhookPayload
     ): ResponseEntity<Unit> {
-        if (webhookSecret.isNotBlank() && auth != webhookSecret) {
+        if (webhookSecret.isBlank() || auth != webhookSecret) {
             return ResponseEntity.status(401).build()
         }
         subscriptionService.handleEvent(
